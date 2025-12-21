@@ -28,28 +28,41 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+            AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.disable())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/**",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**"
-                        ).permitAll()
-                        .requestMatchers("/api/**").authenticated()
-                        .anyRequest().permitAll()
-                );
+        http
+            .csrf(csrf -> csrf.disable())
 
-        http.addFilterBefore(jwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class);
+            .sessionManagement(session ->
+                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+            .authorizeHttpRequests(auth -> auth
+
+                // 🔓 PUBLIC ENDPOINTS
+                .requestMatchers(
+                        "/auth/**",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**",
+                        "/api/visitors",
+                        "/api/appointments/**",
+                        "/api/visits/checkin/**"
+                ).permitAll()
+
+                // 🔐 SECURED ENDPOINTS
+                .requestMatchers("/api/**").authenticated()
+
+                .anyRequest().permitAll()
+            );
+
+        http.addFilterBefore(
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class
+        );
 
         return http.build();
     }
