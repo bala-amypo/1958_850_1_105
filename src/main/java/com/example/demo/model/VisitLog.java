@@ -1,9 +1,9 @@
-package com.example.demo.entity;
+package com.example.demo.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
+@Model
 @Table(name = "visit_logs")
 public class VisitLog {
 
