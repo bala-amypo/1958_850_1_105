@@ -1,11 +1,11 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
 
 @Entity
+@Table(name = "appointments")
 public class Appointment {
 
     @Id
@@ -13,46 +13,62 @@ public class Appointment {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "visitor_id")
     private Visitor visitor;
 
     @ManyToOne
+    @JoinColumn(name = "host_id")
     private Host host;
 
-    // Store internally as LocalDateTime
-    private LocalDateTime appointmentDate;
+    private LocalDate appointmentDate;
+
+    private String purpose;
 
     private String status;
 
     public Appointment() {}
 
-    // GETTERS
-    public Long getId() { return id; }
-    public Visitor getVisitor() { return visitor; }
-    public Host getHost() { return host; }
+    public Long getId() {
+        return id;
+    }
 
-    // 🔥 CRITICAL: return ChronoLocalDateTime
-    public ChronoLocalDateTime<?> getAppointmentDate() {
+    public Visitor getVisitor() {
+        return visitor;
+    }
+
+    public void setVisitor(Visitor visitor) {
+        this.visitor = visitor;
+    }
+
+    public Host getHost() {
+        return host;
+    }
+
+    public void setHost(Host host) {
+        this.host = host;
+    }
+
+    public LocalDate getAppointmentDate() {
         return appointmentDate;
     }
 
-    public String getStatus() { return status; }
-
-    // SETTERS
-    public void setId(Long id) { this.id = id; }
-    public void setVisitor(Visitor visitor) { this.visitor = visitor; }
-    public void setHost(Host host) { this.host = host; }
-
-    // Used by service / internal logic
-    public void setAppointmentDate(LocalDateTime appointmentDate) {
+    public void setAppointmentDate(LocalDate appointmentDate) {
         this.appointmentDate = appointmentDate;
     }
 
-    // Used by JSON / tests
-    public void setAppointmentDate(LocalDate appointmentDate) {
-        if (appointmentDate != null) {
-            this.appointmentDate = appointmentDate.atStartOfDay();
-        }
+    public String getPurpose() {
+        return purpose;
     }
 
-    public void setStatus(String status) { this.status = status; }
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
