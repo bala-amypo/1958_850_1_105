@@ -1,11 +1,19 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "visit_logs")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class VisitLog {
 
     @Id
@@ -13,53 +21,22 @@ public class VisitLog {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "visitor_id")
+    @JoinColumn(name = "visitor_id", nullable = false)
     private Visitor visitor;
 
     @ManyToOne
-    @JoinColumn(name = "host_id")
+    @JoinColumn(name = "host_id", nullable = false)
     private Host host;
 
-    private LocalDateTime checkInTime;
-
-    private LocalDateTime checkOutTime;
-
+    @Column(nullable = false)
     private String purpose;
 
+    @Column(name = "check_in_time")
+    private LocalDateTime checkInTime;
+
+    @Column(name = "check_out_time")
+    private LocalDateTime checkOutTime;
+
+    @Column(name = "access_granted")
     private Boolean accessGranted;
-
-    private Boolean alertSent = false;
-
-    @OneToOne(mappedBy = "visitLog")
-    private AlertNotification alertNotification;
-
-    @PrePersist
-    public void onCheckIn() {
-        this.checkInTime = LocalDateTime.now();
-    }
-
-    public VisitLog() {}
-
-    // Getters and Setters
-    public Long getId() { return id; }
-
-    public Visitor getVisitor() { return visitor; }
-    public void setVisitor(Visitor visitor) { this.visitor = visitor; }
-
-    public Host getHost() { return host; }
-    public void setHost(Host host) { this.host = host; }
-
-    public LocalDateTime getCheckInTime() { return checkInTime; }
-
-    public LocalDateTime getCheckOutTime() { return checkOutTime; }
-    public void setCheckOutTime(LocalDateTime checkOutTime) { this.checkOutTime = checkOutTime; }
-
-    public String getPurpose() { return purpose; }
-    public void setPurpose(String purpose) { this.purpose = purpose; }
-
-    public Boolean getAccessGranted() { return accessGranted; }
-    public void setAccessGranted(Boolean accessGranted) { this.accessGranted = accessGranted; }
-
-    public Boolean getAlertSent() { return alertSent; }
-    public void setAlertSent(Boolean alertSent) { this.alertSent = alertSent; }
 }
