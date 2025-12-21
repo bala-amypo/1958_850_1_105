@@ -9,7 +9,6 @@ import com.example.demo.repository.VisitLogRepository;
 import com.example.demo.repository.VisitorRepository;
 import com.example.demo.service.VisitLogService;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,17 +31,17 @@ public class VisitLogServiceImpl implements VisitLogService {
     public VisitLog checkInVisitor(Long visitorId, Long hostId, String purpose) {
 
         Visitor visitor = visitorRepository.findById(visitorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+                .orElseThrow(() -> new ResourceNotFoundException());
 
         Host host = hostRepository.findById(hostId)
-                .orElseThrow(() -> new ResourceNotFoundException("Host not found"));
+                .orElseThrow(() -> new ResourceNotFoundException());
 
         VisitLog visitLog = new VisitLog();
         visitLog.setVisitor(visitor);
         visitLog.setHost(host);
         visitLog.setPurpose(purpose);
+        visitLog.setCheckInTime(LocalDateTime.now());
         visitLog.setAccessGranted(true);
-        visitLog.setAlertSent(false);
 
         return visitLogRepository.save(visitLog);
     }
@@ -51,25 +50,20 @@ public class VisitLogServiceImpl implements VisitLogService {
     public VisitLog checkOutVisitor(Long visitLogId) {
 
         VisitLog visitLog = visitLogRepository.findById(visitLogId)
-                .orElseThrow(() -> new ResourceNotFoundException("VisitLog not found"));
-
-        if (visitLog.getCheckOutTime() != null) {
-            throw new IllegalStateException("Visitor not checked in");
-        }
+                .orElseThrow(() -> new ResourceNotFoundException());
 
         visitLog.setCheckOutTime(LocalDateTime.now());
         return visitLogRepository.save(visitLog);
     }
 
     @Override
-    public List<VisitLog> getActiveVisits() {
-        return visitLogRepository.findByCheckOutTimeIsNull();
+    public VisitLog getVisitLog(Long id) {
+        return visitLogRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @Override
-    public VisitLog getVisitLog(Long id) {
-        return visitLogRepository.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
-
+    public List<VisitLog> getActiveVisits() {
+        return visitLogRepository.findByCheckOutTimeIsNull();
     }
 }

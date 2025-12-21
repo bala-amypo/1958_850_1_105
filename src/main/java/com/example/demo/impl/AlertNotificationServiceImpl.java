@@ -7,7 +7,6 @@ import com.example.demo.repository.AlertNotificationRepository;
 import com.example.demo.repository.VisitLogRepository;
 import com.example.demo.service.AlertNotificationService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -25,20 +24,13 @@ public class AlertNotificationServiceImpl implements AlertNotificationService {
     @Override
     public AlertNotification sendAlert(Long visitLogId) {
 
-        if (alertRepository.findByVisitLogId(visitLogId).isPresent()) {
-            throw new IllegalArgumentException("Alert already sent");
-        }
-
         VisitLog visitLog = visitLogRepository.findById(visitLogId)
-                .orElseThrow(ResourceNotFoundException::new);
-
+                .orElseThrow(() -> new ResourceNotFoundException());
 
         AlertNotification alert = new AlertNotification();
         alert.setVisitLog(visitLog);
         alert.setSentTo(visitLog.getHost().getEmail());
-        alert.setAlertMessage("Visitor has checked in");
-
-        visitLog.setAlertSent(true);
+        alert.setAlertMessage("Visitor checked in");
 
         return alertRepository.save(alert);
     }
@@ -46,8 +38,7 @@ public class AlertNotificationServiceImpl implements AlertNotificationService {
     @Override
     public AlertNotification getAlert(Long id) {
         return alertRepository.findById(id)
-               .orElseThrow(ResourceNotFoundException::new);
-
+                .orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @Override

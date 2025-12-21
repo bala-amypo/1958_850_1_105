@@ -9,8 +9,6 @@ import com.example.demo.repository.HostRepository;
 import com.example.demo.repository.VisitorRepository;
 import com.example.demo.service.AppointmentService;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -31,17 +29,11 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Appointment createAppointment(Long visitorId, Long hostId, Appointment appointment) {
 
-        if (appointment.getAppointmentDate().isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("appointmentDate cannot be past");
-        }
-
         Visitor visitor = visitorRepository.findById(visitorId)
-                .orElseThrow(ResourceNotFoundException::new);
-
+                .orElseThrow(() -> new ResourceNotFoundException());
 
         Host host = hostRepository.findById(hostId)
-                .orElseThrow(ResourceNotFoundException::new);
-
+                .orElseThrow(() -> new ResourceNotFoundException());
 
         appointment.setVisitor(visitor);
         appointment.setHost(host);
@@ -53,8 +45,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Appointment getAppointment(Long id) {
         return appointmentRepository.findById(id)
-               .orElseThrow(ResourceNotFoundException::new);
-
+                .orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @Override

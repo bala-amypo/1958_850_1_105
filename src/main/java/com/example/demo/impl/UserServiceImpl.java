@@ -5,7 +5,6 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -25,20 +24,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @Override
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @Override
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-               .orElseThrow(ResourceNotFoundException::new);
-
+                .orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @Override

@@ -5,7 +5,6 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.VisitorRepository;
 import com.example.demo.service.VisitorService;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -25,8 +24,7 @@ public class VisitorServiceImpl implements VisitorService {
     @Override
     public Visitor getVisitor(Long id) {
         return visitorRepository.findById(id)
-                .orElseThrow(ResourceNotFoundException::new);
-
+                .orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @Override
