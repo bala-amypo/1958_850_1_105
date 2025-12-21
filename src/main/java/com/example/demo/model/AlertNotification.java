@@ -1,11 +1,9 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "alert_notifications")
 public class AlertNotification {
 
     @Id
@@ -13,51 +11,26 @@ public class AlertNotification {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "visit_log_id", unique = true)
     private VisitLog visitLog;
 
-    private String sentTo;
-
-    private String alertMessage;
-
+    private String message;
     private LocalDateTime sentAt;
-
-    @PrePersist
-    public void prePersist() {
-        this.sentAt = LocalDateTime.now();
-    }
 
     public AlertNotification() {}
 
-    public Long getId() {
-        return id;
-    }
+    // GETTERS
+    public Long getId() { return id; }
+    public VisitLog getVisitLog() { return visitLog; }
+    public String getMessage() { return message; }
+    public LocalDateTime getSentAt() { return sentAt; }
 
-    public VisitLog getVisitLog() {
-        return visitLog;
-    }
-
+    // SETTERS (MANDATORY)
+    public void setId(Long id) { this.id = id; }
     public void setVisitLog(VisitLog visitLog) {
         this.visitLog = visitLog;
     }
-
-    public String getSentTo() {
-        return sentTo;
-    }
-
-    public void setSentTo(String sentTo) {
-        this.sentTo = sentTo;
-    }
-
-    public String getAlertMessage() {
-        return alertMessage;
-    }
-
-    public void setAlertMessage(String alertMessage) {
-        this.alertMessage = alertMessage;
-    }
-
-    public LocalDateTime getSentAt() {
-        return sentAt;
+    public void setMessage(String message) { this.message = message; }
+    public void setSentAt(LocalDateTime sentAt) {
+        this.sentAt = sentAt;
     }
 }
