@@ -30,7 +30,8 @@ public class AlertNotificationServiceImpl implements AlertNotificationService {
         }
 
         VisitLog visitLog = visitLogRepository.findById(visitLogId)
-                .orElseThrow(() -> new ResourceNotFoundException("VisitLog not found"));
+                .orElseThrow(ResourceNotFoundException::new);
+
 
         AlertNotification alert = new AlertNotification();
         alert.setVisitLog(visitLog);
@@ -45,7 +46,8 @@ public class AlertNotificationServiceImpl implements AlertNotificationService {
     @Override
     public AlertNotification getAlert(Long id) {
         return alertRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Alert not found"));
+               .orElseThrow(ResourceNotFoundException::new);
+
     }
 
     @Override

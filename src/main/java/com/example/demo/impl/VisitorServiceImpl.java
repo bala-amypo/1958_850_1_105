@@ -25,7 +25,8 @@ public class VisitorServiceImpl implements VisitorService {
     @Override
     public Visitor getVisitor(Long id) {
         return visitorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+                .orElseThrow(ResourceNotFoundException::new);
+
     }
 
     @Override

@@ -69,6 +69,7 @@ public class VisitLogServiceImpl implements VisitLogService {
     @Override
     public VisitLog getVisitLog(Long id) {
         return visitLogRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("VisitLog not found"));
+                .orElseThrow(ResourceNotFoundException::new);
+
     }
 }

@@ -36,10 +36,12 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         Visitor visitor = visitorRepository.findById(visitorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+                .orElseThrow(ResourceNotFoundException::new);
+
 
         Host host = hostRepository.findById(hostId)
-                .orElseThrow(() -> new ResourceNotFoundException("Host not found"));
+                .orElseThrow(ResourceNotFoundException::new);
+
 
         appointment.setVisitor(visitor);
         appointment.setHost(host);
@@ -51,7 +53,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Appointment getAppointment(Long id) {
         return appointmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+               .orElseThrow(ResourceNotFoundException::new);
+
     }
 
     @Override
