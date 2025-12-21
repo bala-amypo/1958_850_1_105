@@ -13,7 +13,8 @@ public class AlertNotification {
     @OneToOne
     private VisitLog visitLog;
 
-    private String message;
+    private String sentTo;
+    private String alertMessage;
     private LocalDateTime sentAt;
 
     public AlertNotification() {}
@@ -21,16 +22,16 @@ public class AlertNotification {
     // GETTERS
     public Long getId() { return id; }
     public VisitLog getVisitLog() { return visitLog; }
-    public String getMessage() { return message; }
+    public String getSentTo() { return sentTo; }
+    public String getAlertMessage() { return alertMessage; }
     public LocalDateTime getSentAt() { return sentAt; }
 
     // SETTERS (MANDATORY)
     public void setId(Long id) { this.id = id; }
-    public void setVisitLog(VisitLog visitLog) {
-        this.visitLog = visitLog;
+    public void setVisitLog(VisitLog visitLog) { this.visitLog = visitLog; }
+    public void setSentTo(String sentTo) { this.sentTo = sentTo; }
+    public void setAlertMessage(String alertMessage) {
+        this.alertMessage = alertMessage;
     }
-    public void setMessage(String message) { this.message = message; }
-    public void setSentAt(LocalDateTime sentAt) {
-        this.sentAt = sentAt;
-    }
+    public void setSentAt(LocalDateTime sentAt) { this.sentAt = sentAt; }
 }

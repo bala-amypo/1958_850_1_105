@@ -16,7 +16,7 @@ public class Appointment {
     @ManyToOne
     private Host host;
 
-    private LocalDateTime appointmentTime;
+    private LocalDateTime appointmentDate;
     private String status;
 
     public Appointment() {}
@@ -25,15 +25,17 @@ public class Appointment {
     public Long getId() { return id; }
     public Visitor getVisitor() { return visitor; }
     public Host getHost() { return host; }
-    public LocalDateTime getAppointmentTime() { return appointmentTime; }
+    public LocalDateTime getAppointmentDate() {
+        return appointmentDate;
+    }
     public String getStatus() { return status; }
 
-    // SETTERS (MANDATORY)
+    // SETTERS
     public void setId(Long id) { this.id = id; }
     public void setVisitor(Visitor visitor) { this.visitor = visitor; }
     public void setHost(Host host) { this.host = host; }
-    public void setAppointmentTime(LocalDateTime appointmentTime) {
-        this.appointmentTime = appointmentTime;
+    public void setAppointmentDate(LocalDateTime appointmentDate) {
+        this.appointmentDate = appointmentDate;
     }
     public void setStatus(String status) { this.status = status; }
 }
