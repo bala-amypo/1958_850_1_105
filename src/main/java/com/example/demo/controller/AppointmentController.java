@@ -1,15 +1,14 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.ApiResponse;
 import com.example.demo.model.Appointment;
 import com.example.demo.service.AppointmentService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/appointments")
-@Tag(name = "Appointments", description = "Appointment management APIs")
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
@@ -18,25 +17,39 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
 
-    @PostMapping
-    public Appointment createAppointment(@RequestParam Long visitorId,
-                                         @RequestParam Long hostId,
-                                         @RequestBody Appointment appointment) {
-        return appointmentService.createAppointment(visitorId, hostId, appointment);
+    @PostMapping("/{visitorId}/{hostId}")
+    public ResponseEntity<ApiResponse> create(@PathVariable Long visitorId,
+                                              @PathVariable Long hostId,
+                                              @RequestBody Appointment appointment) {
+
+        return new ResponseEntity<>(
+                new ApiResponse(true, "Appointment created",
+                        appointmentService.createAppointment(visitorId, hostId, appointment)),
+                HttpStatus.CREATED
+        );
     }
 
     @GetMapping("/{id}")
-    public Appointment getAppointment(@PathVariable Long id) {
-        return appointmentService.getAppointment(id);
+    public ResponseEntity<ApiResponse> get(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                new ApiResponse(true, "Appointment fetched",
+                        appointmentService.getAppointment(id))
+        );
     }
 
     @GetMapping("/host/{hostId}")
-    public List<Appointment> getAppointmentsForHost(@PathVariable Long hostId) {
-        return appointmentService.getAppointmentsForHost(hostId);
+    public ResponseEntity<ApiResponse> getForHost(@PathVariable Long hostId) {
+        return ResponseEntity.ok(
+                new ApiResponse(true, "Appointments fetched",
+                        appointmentService.getAppointmentsForHost(hostId))
+        );
     }
 
     @GetMapping("/visitor/{visitorId}")
-    public List<Appointment> getAppointmentsForVisitor(@PathVariable Long visitorId) {
-        return appointmentService.getAppointmentsForVisitor(visitorId);
+    public ResponseEntity<ApiResponse> getForVisitor(@PathVariable Long visitorId) {
+        return ResponseEntity.ok(
+                new ApiResponse(true, "Appointments fetched",
+                        appointmentService.getAppointmentsForVisitor(visitorId))
+        );
     }
 }

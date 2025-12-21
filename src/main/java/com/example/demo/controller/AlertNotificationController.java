@@ -1,44 +1,43 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.AlertNotification;
+import com.example.demo.dto.ApiResponse;
 import com.example.demo.service.AlertNotificationService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/alerts")
-@Tag(name = "Alert Notifications", description = "Alert notification management APIs")
 public class AlertNotificationController {
 
-    private final AlertNotificationService alertNotificationService;
+    private final AlertNotificationService alertService;
 
-    public AlertNotificationController(AlertNotificationService alertNotificationService) {
-        this.alertNotificationService = alertNotificationService;
+    public AlertNotificationController(AlertNotificationService alertService) {
+        this.alertService = alertService;
     }
 
-    /**
-     * Send alert for a visit log
-     */
     @PostMapping("/send/{visitLogId}")
-    public AlertNotification sendAlert(@PathVariable Long visitLogId) {
-        return alertNotificationService.sendAlert(visitLogId);
+    public ResponseEntity<ApiResponse> send(@PathVariable Long visitLogId) {
+        return new ResponseEntity<>(
+                new ApiResponse(true, "Alert sent",
+                        alertService.sendAlert(visitLogId)),
+                HttpStatus.CREATED
+        );
     }
 
-    /**
-     * Get alert by ID
-     */
     @GetMapping("/{id}")
-    public AlertNotification getAlert(@PathVariable Long id) {
-        return alertNotificationService.getAlert(id);
+    public ResponseEntity<ApiResponse> get(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                new ApiResponse(true, "Alert fetched",
+                        alertService.getAlert(id))
+        );
     }
 
-    /**
-     * Get all alerts
-     */
     @GetMapping
-    public List<AlertNotification> getAllAlerts() {
-        return alertNotificationService.getAllAlerts();
+    public ResponseEntity<ApiResponse> getAll() {
+        return ResponseEntity.ok(
+                new ApiResponse(true, "Alerts fetched",
+                        alertService.getAllAlerts())
+        );
     }
 }

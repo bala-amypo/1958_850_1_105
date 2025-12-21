@@ -1,10 +1,11 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.ApiResponse;
 import com.example.demo.model.Host;
 import com.example.demo.service.HostService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/hosts")
@@ -17,17 +18,27 @@ public class HostController {
     }
 
     @PostMapping
-    public Host createHost(@RequestBody Host host) {
-        return hostService.createHost(host);
-    }
-
-    @GetMapping("/{id}")
-    public Host getHost(@PathVariable Long id) {
-        return hostService.getHost(id);
+    public ResponseEntity<ApiResponse> create(@RequestBody Host host) {
+        return new ResponseEntity<>(
+                new ApiResponse(true, "Host created",
+                        hostService.createHost(host)),
+                HttpStatus.CREATED
+        );
     }
 
     @GetMapping
-    public List<Host> getAllHosts() {
-        return hostService.getAllHosts();
+    public ResponseEntity<ApiResponse> getAll() {
+        return ResponseEntity.ok(
+                new ApiResponse(true, "Hosts fetched",
+                        hostService.getAllHosts())
+        );
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> get(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                new ApiResponse(true, "Host fetched",
+                        hostService.getHost(id))
+        );
     }
 }
