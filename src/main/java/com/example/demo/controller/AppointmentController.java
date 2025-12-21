@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.Appointment;
+import com.example.demo.model.Appointment;
 import com.example.demo.service.AppointmentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
