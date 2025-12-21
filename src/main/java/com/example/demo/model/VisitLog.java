@@ -1,19 +1,10 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "visit_logs")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class VisitLog {
 
     @Id
@@ -38,5 +29,63 @@ public class VisitLog {
     private LocalDateTime checkOutTime;
 
     @Column(name = "access_granted")
-    private Boolean accessGranted;
+    private boolean accessGranted;
+
+    // ===== GETTERS & SETTERS =====
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Visitor getVisitor() {
+        return visitor;
+    }
+
+    public void setVisitor(Visitor visitor) {
+        this.visitor = visitor;
+    }
+
+    public Host getHost() {
+        return host;
+    }
+
+    public void setHost(Host host) {
+        this.host = host;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+
+    public LocalDateTime getCheckInTime() {
+        return checkInTime;
+    }
+
+    public void setCheckInTime(LocalDateTime checkInTime) {
+        this.checkInTime = checkInTime;
+    }
+
+    public LocalDateTime getCheckOutTime() {
+        return checkOutTime;
+    }
+
+    public void setCheckOutTime(LocalDateTime checkOutTime) {
+        this.checkOutTime = checkOutTime;
+    }
+
+    public boolean isAccessGranted() {
+        return accessGranted;
+    }
+
+    public void setAccessGranted(boolean accessGranted) {
+        this.accessGranted = accessGranted;
+    }
 }
