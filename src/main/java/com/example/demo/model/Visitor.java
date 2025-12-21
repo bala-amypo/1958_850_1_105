@@ -1,14 +1,48 @@
-package com.example.demo.model;
+package com.example.demo.entity;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "visitors")
 public class Visitor {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank
     private String fullName;
+
+    @Email
     private String email;
+
+    @NotBlank
     private String phone;
+
+    @NotBlank
     private String idProofNumber;
 
-    // ===== GETTERS & SETTERS =====
+    private LocalDateTime createdAt;
 
+    @OneToMany(mappedBy = "visitor")
+    private List<Appointment> appointments;
+
+    @OneToMany(mappedBy = "visitor")
+    private List<VisitLog> visitLogs;
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public Visitor() {}
+
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -23,4 +57,6 @@ public class Visitor {
 
     public String getIdProofNumber() { return idProofNumber; }
     public void setIdProofNumber(String idProofNumber) { this.idProofNumber = idProofNumber; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }
