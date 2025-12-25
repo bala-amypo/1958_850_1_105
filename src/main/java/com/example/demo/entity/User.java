@@ -8,21 +8,18 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "hosts", uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "username"), @UniqueConstraint(columnNames = "email")})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Host {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank
-    @Column(nullable = false)
-    private String hostName;
-
-    @Column(nullable = true)
-    private String fullname;
+    @Column(nullable = false, unique = true)
+    private String username;
 
     @NotBlank
     @Email
@@ -31,11 +28,10 @@ public class Host {
 
     @NotBlank
     @Column(nullable = false)
-    private String department;
+    private String password;
 
-    @NotBlank
     @Column(nullable = false)
-    private String phone;
+    private String role = "USER";
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -43,5 +39,6 @@ public class Host {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        if (this.role == null) this.role = "USER";
     }
 }
