@@ -1,74 +1,64 @@
-package com.example.demo.service.impl;
-import com.example.demo.dto.RegisterRequest;
+package com.example.demo.impl;
+
 import com.example.demo.dto.AuthRequest;
-import com.example.demo.dto.AuthResponse;
 import com.example.demo.entity.User;
-import com.example.demo.exception.BadRequestException;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Override
-    public AuthResponse register(RegisterRequest registerRequest) {
-        if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
-            throw new BadRequestException("Username already exists");
-        }
-        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
-            throw new BadRequestException("Email already exists");
-        }
-
-        User user = new User();
-        user.setUsername(registerRequest.getUsername());
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setRole(registerRequest.getRole() != null ? registerRequest.getRole() : "USER");
-
-        User savedUser = userRepository.save(user);
-        String token = jwtUtil.generateToken(savedUser.getUsername());
-
-        return new AuthResponse(token, savedUser.getUsername(), savedUser.getRole(),
-                "User registered successfully");
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
-    public AuthResponse login(AuthRequest authRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            authRequest.getUsername(),
-                            authRequest.getPassword()
-                    )
-            );
-
-            User user = userRepository.findByUsername(authRequest.getUsername())
-                    .orElseThrow(() -> new BadRequestException("User not found"));
-
-            String token = jwtUtil.generateToken(user.getUsername());
-
-            return new AuthResponse(token, user.getUsername(), user.getRole(),
-                    "Login successful");
-        } catch (Exception e) {
-            throw new BadRequestException("Invalid username or password");
+    public User registerUser(User user) {
+        // Check if email exists manually since repository doesn't have existsByEmail
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already exists");
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+    }
+
+    @Override
+    public String login(AuthRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
+        }
+        
+        return jwtUtil.generateToken(user.getEmail(), "USER");
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public User updateUser(User user) {
+        User existingUser = userRepository.findById(user.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        existingUser.setEmail(user.getEmail());
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+        
+        return userRepository.save(existingUser);
     }
 }
