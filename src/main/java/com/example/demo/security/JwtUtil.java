@@ -10,7 +10,7 @@ public class JwtUtil {
 
     private final String secret = "ThisIsAVeryStrongJwtSecretKeyWithMoreThan32Chars!";
 
-    // existing single-arg method (optional)
+    // simple single-argument method (optional)
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -18,7 +18,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    // overloaded method required by test cases
+    // overloaded method required by AuthTests
     public String generateToken(String username, String role, Long id, String email) {
         return Jwts.builder()
                 .setSubject(username)
@@ -29,6 +29,7 @@ public class JwtUtil {
                 .compact();
     }
 
+    // required by AuthTests
     public Claims validateAndGetClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(secret)
