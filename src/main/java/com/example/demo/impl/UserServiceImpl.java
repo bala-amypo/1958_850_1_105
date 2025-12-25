@@ -1,6 +1,8 @@
 package com.example.demo.impl;
 
 import com.example.demo.dto.AuthRequest;
+import com.example.demo.dto.AuthResponse;
+import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtUtil;
@@ -22,25 +24,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User registerUser(User user) {
-        // Check if email exists manually since repository doesn't have existsByEmail
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+    public User register(RegisterRequest request) {
+        if (userRepository.findByEmail(request.email()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+        user.setEmail(request.email());
+        user.setPassword(passwordEncoder.encode(request.password()));
         return userRepository.save(user);
     }
 
     @Override
-    public String login(AuthRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
+    public AuthResponse login(AuthRequest request) {
+        User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
         
-        return jwtUtil.generateToken(user.getEmail(), "USER");
+        String token = jwtUtil.generateToken(user.getEmail(), "USER");
+        return new AuthResponse(token);
     }
 
     @Override
