@@ -1,12 +1,38 @@
 package com.example.demo.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.stereotype.Component;
+
+@Component
 public class JwtUtil {
 
+    private final String secret = "ThisIsAVeryStrongJwtSecretKeyWithMoreThan32Chars!";
+
+    // existing single-arg method (optional)
     public String generateToken(String username) {
-        return "dummy-token";
+        return Jwts.builder()
+                .setSubject(username)
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
     }
 
-    public String extractUsername(String token) {
-        return "user";
+    // overloaded method required by test cases
+    public String generateToken(String username, String role, Long id, String email) {
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("role", role)
+                .claim("userId", id)
+                .claim("email", email)
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
+    }
+
+    public Claims validateAndGetClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
