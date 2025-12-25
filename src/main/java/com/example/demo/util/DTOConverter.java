@@ -16,8 +16,8 @@ public class DTOConverter {
         dto.setCheckInTime(visitLog.getCheckInTime());
         dto.setCheckOutTime(visitLog.getCheckOutTime());
         dto.setPurpose(visitLog.getPurpose());
-        dto.setAccessGranted(visitLog.isAccessGranted());
-        dto.setAlertSent(visitLog.isAlertSent());
+        dto.setAccessGranted(visitLog.getAccessGranted());  // ✅ FIXED for Boolean
+        dto.setAlertSent(visitLog.getAlertSent());          // ✅ FIXED for Boolean
         return dto;
     }
 
