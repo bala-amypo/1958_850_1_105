@@ -25,6 +25,12 @@ public class VisitLogServiceImpl implements VisitLogService {
     
     @Autowired
     private HostRepository hostRepository;
+    
+    public VisitLog getVisitLog(long id) {
+    return visitLogRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("VisitLog not found"));
+}
+
 
     @Override
     public VisitLog checkInVisitor(Long visitorId, Long hostId, String purpose) {

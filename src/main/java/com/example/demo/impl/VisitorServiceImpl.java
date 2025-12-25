@@ -9,22 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class VisitorServiceImpl implements VisitorService {
 
     @Autowired
     private VisitorRepository visitorRepository;
-
-    // No‑arg constructor for hidden tests (they use new VisitorServiceImpl())
-    public VisitorServiceImpl() {
-    }
-
-    // Explicit constructor for normal use / easier testing
-    public VisitorServiceImpl(VisitorRepository visitorRepository) {
-        this.visitorRepository = visitorRepository;
-    }
 
     @Override
     public VisitorDTO createVisitor(VisitorDTO visitorDTO) {
@@ -33,63 +23,61 @@ public class VisitorServiceImpl implements VisitorService {
         visitor.setEmail(visitorDTO.getEmail());
         visitor.setPhone(visitorDTO.getPhone());
         visitor.setIdProofNumber(visitorDTO.getIdProofNumber());
-        Visitor savedVisitor = visitorRepository.save(visitor);
-        return mapToDTO(savedVisitor);
+        Visitor saved = visitorRepository.save(visitor);
+        visitorDTO.setId(saved.getId());
+        return visitorDTO;
     }
 
     @Override
     public List<VisitorDTO> getAllVisitors() {
-        return visitorRepository.findAll().stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+        return visitorRepository.findAll().stream().map(v -> {
+            VisitorDTO dto = new VisitorDTO();
+            dto.setId(v.getId());
+            dto.setFullName(v.getFullName());
+            dto.setEmail(v.getEmail());
+            dto.setPhone(v.getPhone());
+            dto.setIdProofNumber(v.getIdProofNumber());
+            return dto;
+        }).toList();
     }
 
     @Override
     public VisitorDTO getVisitorById(Long id) {
-        Visitor visitor = visitorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found with id: " + id));
-        return mapToDTO(visitor);
+        Visitor v = visitorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+        VisitorDTO dto = new VisitorDTO();
+        dto.setId(v.getId());
+        dto.setFullName(v.getFullName());
+        dto.setEmail(v.getEmail());
+        dto.setPhone(v.getPhone());
+        dto.setIdProofNumber(v.getIdProofNumber());
+        return dto;
     }
 
     @Override
     public VisitorDTO updateVisitor(Long id, VisitorDTO visitorDTO) {
-        Visitor visitor = visitorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found with id: " + id));
-        visitor.setFullName(visitorDTO.getFullName());
-        visitor.setEmail(visitorDTO.getEmail());
-        visitor.setPhone(visitorDTO.getPhone());
-        visitor.setIdProofNumber(visitorDTO.getIdProofNumber());
-        Visitor updatedVisitor = visitorRepository.save(visitor);
-        return mapToDTO(updatedVisitor);
+        Visitor v = visitorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+        v.setFullName(visitorDTO.getFullName());
+        v.setEmail(visitorDTO.getEmail());
+        v.setPhone(visitorDTO.getPhone());
+        v.setIdProofNumber(visitorDTO.getIdProofNumber());
+        visitorRepository.save(v);
+        visitorDTO.setId(v.getId());
+        return visitorDTO;
     }
 
     @Override
     public void deleteVisitor(Long id) {
         if (!visitorRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Visitor not found with id: " + id);
+            throw new ResourceNotFoundException("Visitor not found");
         }
         visitorRepository.deleteById(id);
     }
 
-    private VisitorDTO mapToDTO(Visitor visitor) {
-        return new VisitorDTO(
-                visitor.getId(),
-                visitor.getFullName(),
-                visitor.getEmail(),
-                visitor.getPhone(),
-                visitor.getIdProofNumber()
-        );
-    }
-
-    // --- Extra helper expected by AuthTests ---
-
-    /**
-     * Hidden tests call visitorService.getVisitor(long).
-     */
-    public Visitor getVisitor(long id) {
-        if (visitorRepository == null) {
-            return null;
-        }
-        return visitorRepository.findById(id).orElse(null);
+    // Helper used by tests to get entity directly
+    public Visitor getVisitorEntity(Long id) {
+        return visitorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
     }
 }

@@ -25,6 +25,11 @@ public class HostServiceImpl implements HostService {
     public HostServiceImpl(HostRepository hostRepository) {
         this.hostRepository = hostRepository;
     }
+    public Host getHostEntity(Long id) {
+    return hostRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Host not found"));
+}
+
 
     @Override
     public HostDTO createHost(HostDTO hostDTO) {
