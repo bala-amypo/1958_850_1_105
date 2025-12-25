@@ -1,11 +1,12 @@
-package com.example.demo.model;
+package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
-@Table(name = "appointments")
 public class Appointment {
+
+    public enum Status { SCHEDULED, COMPLETED, CANCELLED }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,28 +18,23 @@ public class Appointment {
     @ManyToOne
     private Host host;
 
-    private LocalDate appointmentDate;
-    private String purpose;
-    private String status;
+    private Date date;
 
-    @PrePersist
-    public void onCreate() { if (status == null) status = "SCHEDULED"; }
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
-    public Appointment() {}
-
-    // getters
     public Long getId() { return id; }
-    public Visitor getVisitor() { return visitor; }
-    public Host getHost() { return host; }
-    public LocalDate getAppointmentDate() { return appointmentDate; }
-    public String getPurpose() { return purpose; }
-    public String getStatus() { return status; }
+    public void setId(Long id) { this.id = id; }
 
-    // setters
-    public void setId(long id) { this.id = id; }
+    public Visitor getVisitor() { return visitor; }
     public void setVisitor(Visitor visitor) { this.visitor = visitor; }
+
+    public Host getHost() { return host; }
     public void setHost(Host host) { this.host = host; }
-    public void setAppointmentDate(LocalDate appointmentDate) { this.appointmentDate = appointmentDate; }
-    public void setPurpose(String purpose) { this.purpose = purpose; }
-    public void setStatus(String status) { this.status = status; }
+
+    public Date getDate() { return date; }
+    public void setDate(Date date) { this.date = date; }
+
+    public Status getStatus() { return status; }
+    public void setStatus(Status status) { this.status = status; }
 }
