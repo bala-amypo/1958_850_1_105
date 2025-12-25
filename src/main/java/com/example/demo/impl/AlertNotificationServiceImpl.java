@@ -7,22 +7,24 @@ import com.example.demo.repository.VisitLogRepository;
 import com.example.demo.service.AlertNotificationService;
 import com.example.demo.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 public class AlertNotificationServiceImpl implements AlertNotificationService {
 
-    private final AlertNotificationRepository alertNotificationRepository;
+    // Rename field to match test
+    private final AlertNotificationRepository alertRepository;
     private final VisitLogRepository visitLogRepository;
 
-    public AlertNotificationServiceImpl(AlertNotificationRepository alertNotificationRepository,
+    public AlertNotificationServiceImpl(AlertNotificationRepository alertRepository,
                                         VisitLogRepository visitLogRepository) {
-        this.alertNotificationRepository = alertNotificationRepository;
+        this.alertRepository = alertRepository;
         this.visitLogRepository = visitLogRepository;
     }
 
     public AlertNotificationServiceImpl() {
-        this.alertNotificationRepository = null;
+        this.alertRepository = null;
         this.visitLogRepository = null;
     }
 
@@ -38,22 +40,22 @@ public class AlertNotificationServiceImpl implements AlertNotificationService {
 
         log.setAlertSent(true);
 
-        return alertNotificationRepository.save(alert);
+        return alertRepository.save(alert);
     }
 
     @Override
     public AlertNotification sendAlert(long visitLogId) {
         AlertNotification alert = new AlertNotification();
-        return alertNotificationRepository.save(alert);
+        return alertRepository.save(alert);
     }
 
     @Override
     public AlertNotification getAlert(long id) {
-        return alertNotificationRepository.findById(id).orElse(null);
+        return alertRepository.findById(id).orElse(null);
     }
 
     @Override
     public List<AlertNotification> getAllAlerts() {
-        return alertNotificationRepository.findAll();
+        return alertRepository.findAll();
     }
 }
