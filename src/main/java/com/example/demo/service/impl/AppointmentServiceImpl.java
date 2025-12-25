@@ -79,4 +79,26 @@ public class AppointmentServiceImpl implements AppointmentService {
     public List<Appointment> getAppointmentsForVisitor(Long visitorId) {
         return appointmentRepository.findByVisitorId(visitorId);
     }
+    @Override
+public Appointment createAppointment(Long visitorId, Long hostId, Appointment appointment) {
+    if (appointment.getAppointmentDate().isBefore(LocalDate.now())) {
+        throw new IllegalArgumentException("appointmentDate cannot be past");
+    }
+
+    Visitor visitor = visitorRepository.findById(visitorId)
+            .orElseThrow(() -> new RuntimeException("Visitor not found"));
+    Host host = hostRepository.findById(hostId)
+            .orElseThrow(() -> new RuntimeException("Host not found"));
+
+    appointment.setVisitor(visitor);
+    appointment.setHost(host);
+
+    // default only at save time
+    if (appointment.getStatus() == null) {
+        appointment.setStatus("SCHEDULED");
+    }
+
+    return appointmentRepository.save(appointment);
 }
+
+
