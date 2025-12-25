@@ -1,11 +1,7 @@
 package com.example.demo.service;
 
-import com.example.demo.model.VisitLog;
-import java.util.List;
+import com.example.demo.entity.VisitLog;
 
 public interface VisitLogService {
-    VisitLog checkInVisitor(Long visitorId, Long hostId, String purpose);
-    VisitLog checkOutVisitor(Long visitLogId);
-    VisitLog getVisitLog(long id); // for test cases
-    List<VisitLog> getActiveVisits();
+    VisitLog createVisitLog(VisitLog visitLog);
 }
