@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.*;
+import com.example.demo.dto.VisitLogDTO;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.*;
 import com.example.demo.service.VisitLogService;
@@ -9,19 +10,17 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VisitLogServiceImpl implements VisitLogService {
     
-    // EXACT field names tests expect via reflection
     VisitLogRepository visitLogRepository;
     VisitorRepository visitorRepository;
     HostRepository hostRepository;
 
-    // NO-ARG constructor (tests call new VisitLogServiceImpl())
     public VisitLogServiceImpl() {}
 
-    // Spring constructor injection
     @Autowired
     public VisitLogServiceImpl(VisitLogRepository visitLogRepository, 
                               VisitorRepository visitorRepository, 
@@ -60,13 +59,28 @@ public class VisitLogServiceImpl implements VisitLogService {
     }
 
     @Override
+    public List<VisitLog> getAllVisitLogs() {
+        return visitLogRepository.findAll();
+    }
+
+    @Override
+    public VisitLog getVisitLogById(Long id) {
+        return visitLogRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("VisitLog not found"));
+    }
+
+    @Override
     public List<VisitLog> getActiveVisits() {
         return visitLogRepository.findByCheckOutTimeIsNull();
     }
 
     @Override
-    public VisitLog getVisitLog(Long id) {
-        return visitLogRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("VisitLog not found"));
+    public List<VisitLog> getVisitLogsByHostId(Long hostId) {
+        return visitLogRepository.findByHostId(hostId);
+    }
+
+    @Override
+    public List<VisitLog> getVisitLogsByVisitorId(Long visitorId) {
+        return visitLogRepository.findByVisitorId(visitorId);
     }
 }

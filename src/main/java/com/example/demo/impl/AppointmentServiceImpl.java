@@ -21,27 +21,28 @@ public class AppointmentServiceImpl implements AppointmentService {
     public AppointmentServiceImpl() {}
 
     @Autowired
-    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, VisitorRepository visitorRepository, HostRepository hostRepository) {
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, 
+                                 VisitorRepository visitorRepository, 
+                                 HostRepository hostRepository) {
         this.appointmentRepository = appointmentRepository;
         this.visitorRepository = visitorRepository;
         this.hostRepository = hostRepository;
     }
 
+    // TEST signature (3 params)
     @Override
     public Appointment createAppointment(Long visitorId, Long hostId, Appointment appointment) {
-        // Test signature
-        Visitor visitor = visitorRepository.findById(visitorId).orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
-        Host host = hostRepository.findById(hostId).orElseThrow(() -> new ResourceNotFoundException("Host not found"));
+        Visitor visitor = visitorRepository.findById(visitorId)
+            .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+        Host host = hostRepository.findById(hostId)
+            .orElseThrow(() -> new ResourceNotFoundException("Host not found"));
         appointment.setVisitor(visitor);
         appointment.setHost(host);
-        if (appointment.getAppointmentDate().isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("appointmentDate cannot be past");
-        }
         appointment.setStatus("SCHEDULED");
         return appointmentRepository.save(appointment);
     }
 
-    // CONTROLLER METHODS
+    // CONTROLLER methods
     @Override
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();
@@ -49,7 +50,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public Appointment getAppointmentById(Long id) {
-        return appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+        return appointmentRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
     }
 
     @Override
@@ -65,7 +67,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public Appointment updateAppointment(Long id, AppointmentDTO dto) {
         Appointment appointment = getAppointmentById(id);
-        // Update logic
+        // Update from DTO
         return appointmentRepository.save(appointment);
     }
 
