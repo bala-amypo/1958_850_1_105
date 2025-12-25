@@ -66,7 +66,7 @@ public class VisitLogServiceImpl implements VisitLogService {
     }
 
     @Override
-    public VisitLogDTO getVisitLog(Long id) {
+    public VisitLogDTO getVisitLogById(Long id) {
         VisitLog visitLog = visitLogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("VisitLog not found"));
         return toDTO(visitLog);
