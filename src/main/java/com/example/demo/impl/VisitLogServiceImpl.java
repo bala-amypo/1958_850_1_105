@@ -26,21 +26,22 @@ public class VisitLogServiceImpl implements VisitLogService {
         this.hostRepository = hostRepository;
     }
 
-    // FIXED: Correct method signature from interface
-    public VisitLogDTO checkInVisitor(Long visitorId, Long hostId, String purpose) {
-        Visitor visitor = visitorRepository.findById(visitorId)
+    // FIXED: Interface expects VisitLogDTO parameter
+    public VisitLogDTO checkInVisitor(VisitLogDTO visitLogDTO) {
+        Visitor visitor = visitorRepository.findById(visitLogDTO.getVisitorId())
                 .orElseThrow(() -> new RuntimeException("Visitor not found"));
-        Host host = hostRepository.findById(hostId)
+        Host host = hostRepository.findById(visitLogDTO.getHostId())
                 .orElseThrow(() -> new RuntimeException("Host not found"));
         
         VisitLog visitLog = new VisitLog();
         visitLog.setVisitor(visitor);
         visitLog.setHost(host);
-        visitLog.setPurpose(purpose);
+        visitLog.setPurpose(visitLogDTO.getPurpose());
         visitLog.setAccessGranted(true);
         visitLog.setAlertSent(false);
         VisitLog saved = visitLogRepository.save(visitLog);
-        return new VisitLogDTO(saved.getId(), visitorId, hostId, saved.getCheckInTime(), null, purpose, true, false);
+        return new VisitLogDTO(saved.getId(), visitLogDTO.getVisitorId(), visitLogDTO.getHostId(), 
+                              saved.getCheckInTime(), null, visitLogDTO.getPurpose(), true, false);
     }
 
     public VisitLogDTO checkOutVisitor(Long visitLogId) {
@@ -69,7 +70,6 @@ public class VisitLogServiceImpl implements VisitLogService {
         return toDTO(visitLog);
     }
 
-    // REQUIRED by interface
     public List<VisitLogDTO> getAllVisitLogs() {
         return visitLogRepository.findAll()
                 .stream()
