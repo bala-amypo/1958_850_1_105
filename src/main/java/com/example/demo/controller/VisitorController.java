@@ -26,4 +26,8 @@ public class VisitorController {
         return visitorService.getVisitorById(id);
     }
 
-    @GetMap
+    @GetMapping
+    public List<Visitor> getAllVisitors() {
+        return visitorService.getAllVisitors();
+    }
+}
