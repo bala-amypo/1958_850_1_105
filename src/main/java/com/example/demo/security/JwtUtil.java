@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;   // ✅ correct import
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,18 +23,13 @@ public class JwtUtil {
     @Value("${app.jwtExpirationMs:3600000}")
     private long jwtExpirationMs = 3600000L;
 
-    // for ReflectionTestUtils in tests
+    // For tests (ReflectionTestUtils)
     public void setSecret(String secret) { this.secret = secret; }
     public void setJwtExpirationMs(long jwtExpirationMs) { this.jwtExpirationMs = jwtExpirationMs; }
 
     private SecretKey getSigningKey() {
-        // 32-byte key is strong enough for HS256 and works with tests
-        return javax.crypto.spec.SecretKeySpec(
-                secret.getBytes(),
-                0,
-                secret.getBytes().length,
-                "HmacSHA256"
-        );
+        byte[] keyBytes = secret.getBytes();
+        return new SecretKeySpec(keyBytes, 0, keyBytes.length, "HmacSHA256");
     }
 
     public String generateToken(String username, String role, Long userId, String email) {
@@ -46,12 +43,11 @@ public class JwtUtil {
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                // use HS256 so 256‑bit key is valid
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)   // HS256 so 256‑bit key is valid
                 .compact();
     }
 
-    // Return Jws<Claims> so tests can call .getBody()
+    // tests call: jwt.validateAndGetClaims(token).getBody()
     public Jws<Claims> validateAndGetClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
