@@ -1,72 +1,63 @@
 package com.example.demo.controller;
-import com.example.demo.dto.VisitLogDTO;
+
 import com.example.demo.dto.ApiResponse;
+import com.example.demo.dto.VisitLogDTO;
+import com.example.demo.entity.VisitLog;
 import com.example.demo.service.VisitLogService;
+import com.example.demo.util.DTOConverter;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/visits")
-@Tag(name = "Visit Logs", description = "Visitor check-in/out and tracking APIs")
+@RequestMapping("/api/visitlogs")
+@Tag(name = "VisitLogs", description = "Visit log management APIs")
 @SecurityRequirement(name = "Bearer Authentication")
 public class VisitLogController {
+
     @Autowired
     private VisitLogService visitLogService;
 
-    @PostMapping("/check-in")
-    @Operation(summary = "Check-in visitor")
-    public ResponseEntity<ApiResponse> checkInVisitor(@Valid @RequestBody VisitLogDTO visitLogDTO) {
-        VisitLogDTO checkedInVisit = visitLogService.checkInVisitor(visitLogDTO);
+    @PostMapping("/checkin/{visitorId}/{hostId}")
+    @Operation(summary = "Check in a visitor")
+    public ResponseEntity<ApiResponse> checkInVisitor(
+            @PathVariable Long visitorId,
+            @PathVariable Long hostId,
+            @Valid @RequestBody VisitLogDTO visitLogDTO) {
+
+        VisitLog visitLog = visitLogService.checkInVisitor(
+                visitorId,
+                hostId,
+                visitLogDTO.getPurpose()
+        );
+        VisitLogDTO body = DTOConverter.toVisitLogDTO(visitLog);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse(true, "Visitor checked in successfully", checkedInVisit));
+                .body(new ApiResponse(true, "Visitor checked in successfully", body));
     }
 
-    @PostMapping("/check-out/{visitLogId}")
-    @Operation(summary = "Check-out visitor")
+    @PutMapping("/checkout/{visitLogId}")
+    @Operation(summary = "Check out a visitor")
     public ResponseEntity<ApiResponse> checkOutVisitor(@PathVariable Long visitLogId) {
-        VisitLogDTO checkedOutVisit = visitLogService.checkOutVisitor(visitLogId);
-        return ResponseEntity.ok(new ApiResponse(true, "Visitor checked out successfully", checkedOutVisit));
+        VisitLog visitLog = visitLogService.checkOutVisitor(visitLogId);
+        VisitLogDTO body = DTOConverter.toVisitLogDTO(visitLog);
+        return ResponseEntity.ok(new ApiResponse(true, "Visitor checked out successfully", body));
     }
 
     @GetMapping
     @Operation(summary = "Get all visit logs")
     public ResponseEntity<ApiResponse> getAllVisitLogs() {
-        List<VisitLogDTO> visitLogs = visitLogService.getAllVisitLogs();
-        return ResponseEntity.ok(new ApiResponse(true, "Visit logs retrieved successfully", visitLogs));
+        List<VisitLog> logs = visitLogService.getAllVisitLogs();
+        List<VisitLogDTO> body = DTOConverter.toVisitLogDTOList(logs);
+        return ResponseEntity.ok(new ApiResponse(true, "Visit logs retrieved successfully", body));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get visit log by ID")
-    public ResponseEntity<ApiResponse> getVisitLogById(@PathVariable Long id) {
-        VisitLogDTO visitLog = visitLogService.getVisitLogById(id);
-        return ResponseEntity.ok(new ApiResponse(true, "Visit log retrieved successfully", visitLog));
-    }
-
-    @GetMapping("/active")
-    @Operation(summary = "Get active visits")
-    public ResponseEntity<ApiResponse> getActiveVisits() {
-        List<VisitLogDTO> activeVisits = visitLogService.getActiveVisits();
-        return ResponseEntity.ok(new ApiResponse(true, "Active visits retrieved successfully", activeVisits));
-    }
-
-    @GetMapping("/host/{hostId}")
-    @Operation(summary = "Get visit logs by host ID")
-    public ResponseEntity<ApiResponse> getVisitLogsByHostId(@PathVariable Long hostId) {
-        List<VisitLogDTO> visitLogs = visitLogService.getVisitLogsByHostId(hostId);
-        return ResponseEntity.ok(new ApiResponse(true, "Visit logs retrieved successfully", visitLogs));
-    }
-
-    @GetMapping("/visitor/{visitorId}")
-    @Operation(summary = "Get visit logs by visitor ID")
-    public ResponseEntity<ApiResponse> getVisitLogsByVisitorId(@PathVariable Long visitorId) {
-        List<VisitLogDTO> visitLogs = visitLogService.getVisitLogsByVisitorId(visitorId);
-        return ResponseEntity.ok(new ApiResponse(true, "Visit logs retrieved successfully", visitLogs));
-    }
-}
+    public Response
