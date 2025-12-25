@@ -18,22 +18,22 @@ public class Visitor {
     private Long id;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
     @Email
-    @Column(nullable = true)
+    @Column(name = "email", nullable = true)
     private String email;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(name = "phone", nullable = false)
     private String phone;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(name = "id_proof_number", nullable = false)
     private String idProofNumber;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

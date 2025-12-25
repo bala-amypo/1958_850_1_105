@@ -24,20 +24,20 @@ public class VisitLog {
     @JoinColumn(name = "host_id", nullable = false)
     private Host host;
 
-    @Column(nullable = false)
+    @Column(name = "check_in_time", nullable = false)
     private LocalDateTime checkInTime;
 
-    @Column(nullable = true)
+    @Column(name = "check_out_time", nullable = true)
     private LocalDateTime checkOutTime;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(name = "purpose", nullable = false)
     private String purpose;
 
-    @Column(nullable = false)
+    @Column(name = "access_granted", nullable = false)
     private Boolean accessGranted;
 
-    @Column(nullable = false)
+    @Column(name = "alert_sent", nullable = false)
     private Boolean alertSent = false;
 
     @PrePersist

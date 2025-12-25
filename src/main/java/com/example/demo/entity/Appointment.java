@@ -24,14 +24,14 @@ public class Appointment {
     @JoinColumn(name = "host_id", nullable = false)
     private Host host;
 
-    @Column(nullable = false)
+    @Column(name = "appointment_date", nullable = false)
     private LocalDate appointmentDate;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(name = "purpose", nullable = false)
     private String purpose;
 
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private String status = "SCHEDULED";
 
     @PrePersist

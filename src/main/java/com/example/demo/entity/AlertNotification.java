@@ -21,14 +21,14 @@ public class AlertNotification {
     private VisitLog visitLog;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(name = "sent_to", nullable = false)
     private String sentTo;
 
     @NotBlank
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(name = "alert_message", nullable = false, columnDefinition = "TEXT")
     private String alertMessage;
 
-    @Column(nullable = false)
+    @Column(name = "sent_at", nullable = false)
     private LocalDateTime sentAt;
 
     @PrePersist

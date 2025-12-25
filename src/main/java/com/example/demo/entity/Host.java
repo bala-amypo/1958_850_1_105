@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "hosts", uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
+@Table(name = "hosts")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,26 +18,26 @@ public class Host {
     private Long id;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(name = "host_name", nullable = false)
     private String hostName;
 
-    @Column(nullable = true)
+    @Column(name = "fullname", nullable = true)
     private String fullname;
 
     @NotBlank
     @Email
-    @Column(nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(name = "department", nullable = false)
     private String department;
 
     @NotBlank
-    @Column(nullable = false)
+    @Column(name = "phone", nullable = false)
     private String phone;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
