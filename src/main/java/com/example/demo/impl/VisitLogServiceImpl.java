@@ -10,6 +10,9 @@ import com.example.demo.repository.HostRepository;
 import com.example.demo.service.VisitLogService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class VisitLogServiceImpl implements VisitLogService {
 
@@ -51,15 +54,15 @@ public class VisitLogServiceImpl implements VisitLogService {
         VisitLog saved = visitLogRepository.save(visitLog);
         return new VisitLogDTO(saved.getId(), saved.getVisitor().getId(), saved.getHost().getId(), 
                               saved.getCheckInTime(), saved.getCheckOutTime(), saved.getPurpose(), 
-                              saved.getAccessGranted(), saved.isAlertSent());
+                              saved.getAccessGranted(), saved.getAlertSent());
     }
 
     @Override
-    public java.util.List<VisitLogDTO> getActiveVisits() {
+    public List<VisitLogDTO> getActiveVisits() {
         return visitLogRepository.findByCheckOutTimeIsNull()
                 .stream()
                 .map(this::toDTO)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -70,17 +73,25 @@ public class VisitLogServiceImpl implements VisitLogService {
     }
 
     @Override
-    public java.util.List<VisitLogDTO> getVisitLogsByVisitorId(Long visitorId) {
+    public List<VisitLogDTO> getVisitLogsByVisitorId(Long visitorId) {
         return visitLogRepository.findByVisitorId(visitorId)
                 .stream()
                 .map(this::toDTO)
-                .toList();
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<VisitLogDTO> getVisitLogsByHostId(Long hostId) {
+        return visitLogRepository.findByHostId(hostId)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     private VisitLogDTO toDTO(VisitLog visitLog) {
         return new VisitLogDTO(visitLog.getId(), visitLog.getVisitor().getId(), 
                               visitLog.getHost().getId(), visitLog.getCheckInTime(), 
                               visitLog.getCheckOutTime(), visitLog.getPurpose(), 
-                              visitLog.getAccessGranted(), visitLog.isAlertSent());
+                              visitLog.getAccessGranted(), visitLog.getAlertSent());
     }
 }
