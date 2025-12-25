@@ -1,96 +1,79 @@
-package com.example.demo.service.impl;
+package com.example.demo.security;
 
-import com.example.demo.dto.VisitorDTO;
-import com.example.demo.entity.Visitor;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.VisitorRepository;
-import com.example.demo.service.VisitorService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
+import javax.crypto.SecretKey;
+import java.util.Date;
+import java.util.function.Function;
 
-@Service
-public class VisitorServiceImpl implements VisitorService {
+@Component
+public class JwtUtil {
+    public String secret;
+    public Long jwtExpirationMs;
 
-    @Autowired
-    private VisitorRepository visitorRepository;
+    public JwtUtil() {}
 
-    // Added so tests can new VisitorServiceImpl(visitorRepository)
-    public VisitorServiceImpl() {
+    public String generateToken(String username, String role, Long userId, String email) {
+        return Jwts.builder()
+            .setSubject(username)
+            .claim("role", role)
+            .claim("userId", userId)
+            .claim("email", email)
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+            .compact();
     }
 
-    public VisitorServiceImpl(VisitorRepository visitorRepository) {
-        this.visitorRepository = visitorRepository;
+    // FOR TESTS - 2 params
+    public String generateToken(String username, String role) {
+        return Jwts.builder()
+            .setSubject(username)
+            .claim("role", role)
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+            .compact();
     }
 
-    @Override
-    public VisitorDTO createVisitor(VisitorDTO visitorDTO) {
-        Visitor visitor = new Visitor();
-        visitor.setFullName(visitorDTO.getFullName());
-        visitor.setEmail(visitorDTO.getEmail());
-        visitor.setPhone(visitorDTO.getPhone());
-        visitor.setIdProofNumber(visitorDTO.getIdProofNumber());
-        Visitor saved = visitorRepository.save(visitor);
-        visitorDTO.setId(saved.getId());
-        return visitorDTO;
-    }
-
-    @Override
-    public List<VisitorDTO> getAllVisitors() {
-        return visitorRepository.findAll().stream().map(v -> {
-            VisitorDTO dto = new VisitorDTO();
-            dto.setId(v.getId());
-            dto.setFullName(v.getFullName());
-            dto.setEmail(v.getEmail());
-            dto.setPhone(v.getPhone());
-            dto.setIdProofNumber(v.getIdProofNumber());
-            return dto;
-        }).toList();
-    }
-
-    @Override
-    public VisitorDTO getVisitorById(Long id) {
-        Visitor v = visitorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
-        VisitorDTO dto = new VisitorDTO();
-        dto.setId(v.getId());
-        dto.setFullName(v.getFullName());
-        dto.setEmail(v.getEmail());
-        dto.setPhone(v.getPhone());
-        dto.setIdProofNumber(v.getIdProofNumber());
-        return dto;
-    }
-
-    @Override
-    public VisitorDTO updateVisitor(Long id, VisitorDTO visitorDTO) {
-        Visitor v = visitorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
-        v.setFullName(visitorDTO.getFullName());
-        v.setEmail(visitorDTO.getEmail());
-        v.setPhone(visitorDTO.getPhone());
-        v.setIdProofNumber(visitorDTO.getIdProofNumber());
-        visitorRepository.save(v);
-        visitorDTO.setId(v.getId());
-        return visitorDTO;
-    }
-
-    @Override
-    public void deleteVisitor(Long id) {
-        if (!visitorRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Visitor not found");
+    public Claims validateAndGetClaims(String token) {
+        try {
+            return Jwts.parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        } catch (Exception e) {
+            throw new JwtException("Invalid JWT token");
         }
-        visitorRepository.deleteById(id);
     }
 
-    // Helper used by tests to get entity directly: visitorService.getVisitor(long)
-    public Visitor getVisitor(long id) {
-        return visitorRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+    // JWTAuthenticationFilter expects these EXACT methods
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
-    // Existing helper (optional, can stay)
-    public Visitor getVisitorEntity(Long id) {
-        return getVisitor(id);
+    public boolean isTokenValid(String token, String username) {
+        final String usernameFromToken = extractUsername(token);
+        return (usernameFromToken.equals(username) && !isTokenExpired(token));
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = validateAndGetClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    private SecretKey getSignInKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 }
