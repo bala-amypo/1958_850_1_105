@@ -2,6 +2,7 @@ package com.example.demo.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,7 @@ public class JwtUtil {
     @Value("${app.jwtExpirationMs:3600000}")
     private long jwtExpirationMs = 3600000L;
     
-    // For tests - ReflectionTestUtils
+    // For ReflectionTestUtils in tests
     public void setSecret(String secret) {
         this.secret = secret;
     }
@@ -49,14 +50,13 @@ public class JwtUtil {
                 .compact();
     }
     
-    // Test-compatible method - returns Claims directly (matches test expectations)
-    public Claims validateAndGetClaims(String token) {
+    // EXACTLY matches test expectations: returns ParsedClaimsJws with .getBody()
+    public io.jsonwebtoken.JwtParser validateAndGetClaims(String token) {
         try {
             return Jwts.parser()
                     .setSigningKey(getSigningKey())
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (Exception e) {
+                    .parseClaimsJws(token);
+        } catch (JwtException | IllegalArgumentException e) {
             throw new RuntimeException("Invalid JWT token", e);
         }
     }
