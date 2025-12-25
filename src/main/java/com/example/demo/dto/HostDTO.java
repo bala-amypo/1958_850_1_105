@@ -16,7 +16,7 @@ public class HostDTO {
     private String department;
     private String phone;
 
-    // Helper constructor for tests
+    // For tests: new HostDTO(hostEntity)
     public HostDTO(Host host) {
         this.id = host.getId();
         this.hostName = host.getHostName();

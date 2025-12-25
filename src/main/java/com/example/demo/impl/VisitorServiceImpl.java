@@ -25,8 +25,7 @@ public class VisitorServiceImpl implements VisitorService {
 
     @Override
     public VisitorDTO createVisitor(VisitorDTO visitorDTO) {
-        Visitor visitor = fromDto(visitorDTO);
-        Visitor saved = visitorRepository.save(visitor);
+        Visitor saved = visitorRepository.save(fromDto(visitorDTO));
         return toDto(saved);
     }
 
@@ -64,13 +63,11 @@ public class VisitorServiceImpl implements VisitorService {
         visitorRepository.deleteById(id);
     }
 
-    // Helper used by tests: visitorService.getVisitor(long)
+    // Tests call this: visitorService.getVisitor(long)
     public Visitor getVisitor(long id) {
         return visitorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
     }
-
-    // Static helpers so tests can easily convert if they want
 
     public static VisitorDTO toDto(Visitor v) {
         VisitorDTO dto = new VisitorDTO();

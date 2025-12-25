@@ -1,33 +1,91 @@
-package com.example.demo.dto;
+package com.example.demo.service.impl;
 
-import com.example.demo.entity.VisitLog;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import com.example.demo.dto.VisitorDTO;
+import com.example.demo.entity.Visitor;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.repository.VisitorRepository;
+import com.example.demo.service.VisitorService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class VisitLogDTO {
-    private Long id;
-    private Long visitorId;
-    private Long hostId;
-    private LocalDateTime checkInTime;
-    private LocalDateTime checkOutTime;
-    private String purpose;
-    private Boolean accessGranted;
-    private Boolean alertSent;
+@Service
+public class VisitorServiceImpl implements VisitorService {
 
-    public VisitLogDTO(VisitLog log) {
-        this.id = log.getId();
-        this.visitorId = log.getVisitor() != null ? log.getVisitor().getId() : null;
-        this.hostId = log.getHost() != null ? log.getHost().getId() : null;
-        this.checkInTime = log.getCheckInTime();
-        this.checkOutTime = log.getCheckOutTime();
-        this.purpose = log.getPurpose();
-        this.accessGranted = log.getAccessGranted();
-        this.alertSent = log.getAlertSent();
+    @Autowired
+    private VisitorRepository visitorRepository;
+
+    public VisitorServiceImpl() {
+    }
+
+    public VisitorServiceImpl(VisitorRepository visitorRepository) {
+        this.visitorRepository = visitorRepository;
+    }
+
+    @Override
+    public VisitorDTO createVisitor(VisitorDTO visitorDTO) {
+        Visitor saved = visitorRepository.save(fromDto(visitorDTO));
+        return toDto(saved);
+    }
+
+    @Override
+    public List<VisitorDTO> getAllVisitors() {
+        return visitorRepository.findAll().stream()
+                .map(VisitorServiceImpl::toDto)
+                .toList();
+    }
+
+    @Override
+    public VisitorDTO getVisitorById(Long id) {
+        Visitor v = visitorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+        return toDto(v);
+    }
+
+    @Override
+    public VisitorDTO updateVisitor(Long id, VisitorDTO visitorDTO) {
+        Visitor v = visitorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+        v.setFullName(visitorDTO.getFullName());
+        v.setEmail(visitorDTO.getEmail());
+        v.setPhone(visitorDTO.getPhone());
+        v.setIdProofNumber(visitorDTO.getIdProofNumber());
+        Visitor saved = visitorRepository.save(v);
+        return toDto(saved);
+    }
+
+    @Override
+    public void deleteVisitor(Long id) {
+        if (!visitorRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Visitor not found");
+        }
+        visitorRepository.deleteById(id);
+    }
+
+    // Tests call this: visitorService.getVisitor(long)
+    public Visitor getVisitor(long id) {
+        return visitorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+    }
+
+    public static VisitorDTO toDto(Visitor v) {
+        VisitorDTO dto = new VisitorDTO();
+        dto.setId(v.getId());
+        dto.setFullName(v.getFullName());
+        dto.setEmail(v.getEmail());
+        dto.setPhone(v.getPhone());
+        dto.setIdProofNumber(v.getIdProofNumber());
+        return dto;
+    }
+
+    public static Visitor fromDto(VisitorDTO dto) {
+        Visitor v = new Visitor();
+        v.setId(dto.getId());
+        v.setFullName(dto.getFullName());
+        v.setEmail(dto.getEmail());
+        v.setPhone(dto.getPhone());
+        v.setIdProofNumber(dto.getIdProofNumber());
+        return v;
     }
 }
