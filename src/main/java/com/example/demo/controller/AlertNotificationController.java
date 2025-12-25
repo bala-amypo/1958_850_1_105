@@ -3,9 +3,10 @@ package com.example.demo.controller;
 import com.example.demo.model.AlertNotification;
 import com.example.demo.service.AlertNotificationService;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/alerts")
+@RequestMapping("/alerts")
 public class AlertNotificationController {
 
     private final AlertNotificationService alertService;
@@ -14,11 +15,8 @@ public class AlertNotificationController {
         this.alertService = alertService;
     }
 
-    @PostMapping("/send")
-    public AlertNotification sendAlert(
-            @RequestParam Long visitLogId,
-            @RequestParam String message) {
-
-        return alertService.sendAlert(visitLogId, message);
+    @GetMapping
+    public List<AlertNotification> getAllAlerts() {
+        return alertService.getAllAlerts();
     }
 }
