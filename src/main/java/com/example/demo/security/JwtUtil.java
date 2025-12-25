@@ -16,7 +16,6 @@ import java.util.function.Function;
 public class JwtUtil {
 
     private static final String SECRET = "mysecretkeymysecretkeymysecretkeymysecretkey";
-
     private static final long EXPIRATION_MS = 60 * 60 * 1000;
 
     private Key getSigningKey() {
@@ -63,12 +62,15 @@ public class JwtUtil {
         return extractedUsername.equals(username) && !isTokenExpired(token);
     }
 
+    public boolean isTokenValid(String token, String username) {
+        return validateToken(token, username);
+    }
+
     private Claims parseToken(String token) {
         Jws<Claims> jws = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token);
-
         return jws.getBody();
     }
 }

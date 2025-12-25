@@ -32,35 +32,63 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public AppointmentDTO createAppointment(AppointmentDTO dto) {
-        Host host = hostRepository.findById(dto.getHostId())
-                .orElseThrow(() -> new IllegalArgumentException("Host not found"));
-        Visitor visitor = visitorRepository.findById(dto.getVisitorId())
-                .orElseThrow(() -> new IllegalArgumentException("Visitor not found"));
-
-        Appointment appointment = new Appointment();
-        appointment.setId(dto.getId());
-        appointment.setHost(host);
-        appointment.setVisitor(visitor);
-        appointment.setAppointmentDate(dto.getAppointmentDate());
-        appointment.setPurpose(dto.getPurpose());
-        appointment.setStatus(dto.getStatus());
-
+        Appointment appointment = fromDto(dto);
         Appointment saved = appointmentRepository.save(appointment);
         return toDto(saved);
     }
 
     @Override
-    public List<AppointmentDTO> getAppointmentsForHost(long hostId) {
-        return appointmentRepository.findByHostId(hostId).stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    public List<AppointmentDTO> getAllAppointments() {
+        return appointmentRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
     }
 
     @Override
-    public List<AppointmentDTO> getAppointmentsForVisitor(long visitorId) {
-        return appointmentRepository.findByVisitorId(visitorId).stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    public AppointmentDTO getAppointmentById(Long id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+        return toDto(appointment);
+    }
+
+    @Override
+    public List<AppointmentDTO> getAppointmentsByHostId(Long hostId) {
+        return appointmentRepository.findByHostId(hostId).stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AppointmentDTO> getAppointmentsByVisitorId(Long visitorId) {
+        return appointmentRepository.findByVisitorId(visitorId).stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public AppointmentDTO updateAppointment(Long id, AppointmentDTO dto) {
+        Appointment existing = appointmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+        existing = fromDto(dto, existing);
+        Appointment saved = appointmentRepository.save(existing);
+        return toDto(saved);
+    }
+
+    @Override
+    public void deleteAppointment(Long id) {
+        appointmentRepository.deleteById(id);
+    }
+
+    private Appointment fromDto(AppointmentDTO dto) {
+        return fromDto(dto, new Appointment());
+    }
+
+    private Appointment fromDto(AppointmentDTO dto, Appointment appointment) {
+        Host host = hostRepository.findById(dto.getHostId())
+                .orElseThrow(() -> new IllegalArgumentException("Host not found"));
+        Visitor visitor = visitorRepository.findById(dto.getVisitorId())
+                .orElseThrow(() -> new IllegalArgumentException("Visitor not found"));
+
+        appointment.setHost(host);
+        appointment.setVisitor(visitor);
+        appointment.setAppointmentDate(dto.getAppointmentDate());
+        appointment.setPurpose(dto.getPurpose());
+        appointment.setStatus(dto.getStatus());
+        return appointment;
     }
 
     private AppointmentDTO toDto(Appointment a) {
