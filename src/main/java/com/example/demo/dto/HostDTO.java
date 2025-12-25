@@ -1,6 +1,6 @@
 package com.example.demo.dto;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Email;
+
+import com.example.demo.entity.Host;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,19 +10,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class HostDTO {
     private Long id;
-
-    @NotBlank(message = "Host name is required")
     private String hostName;
-
     private String fullname;
-
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
     private String email;
-
-    @NotBlank(message = "Department is required")
     private String department;
-
-    @NotBlank(message = "Phone is required")
     private String phone;
+
+    // Helper constructor for tests
+    public HostDTO(Host host) {
+        this.id = host.getId();
+        this.hostName = host.getHostName();
+        this.fullname = host.getFullname();
+        this.email = host.getEmail();
+        this.department = host.getDepartment();
+        this.phone = host.getPhone();
+    }
 }

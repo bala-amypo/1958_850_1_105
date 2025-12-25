@@ -16,7 +16,6 @@ public class VisitorServiceImpl implements VisitorService {
     @Autowired
     private VisitorRepository visitorRepository;
 
-    // Added so tests can new VisitorServiceImpl(visitorRepository)
     public VisitorServiceImpl() {
     }
 
@@ -26,40 +25,23 @@ public class VisitorServiceImpl implements VisitorService {
 
     @Override
     public VisitorDTO createVisitor(VisitorDTO visitorDTO) {
-        Visitor visitor = new Visitor();
-        visitor.setFullName(visitorDTO.getFullName());
-        visitor.setEmail(visitorDTO.getEmail());
-        visitor.setPhone(visitorDTO.getPhone());
-        visitor.setIdProofNumber(visitorDTO.getIdProofNumber());
+        Visitor visitor = fromDto(visitorDTO);
         Visitor saved = visitorRepository.save(visitor);
-        visitorDTO.setId(saved.getId());
-        return visitorDTO;
+        return toDto(saved);
     }
 
     @Override
     public List<VisitorDTO> getAllVisitors() {
-        return visitorRepository.findAll().stream().map(v -> {
-            VisitorDTO dto = new VisitorDTO();
-            dto.setId(v.getId());
-            dto.setFullName(v.getFullName());
-            dto.setEmail(v.getEmail());
-            dto.setPhone(v.getPhone());
-            dto.setIdProofNumber(v.getIdProofNumber());
-            return dto;
-        }).toList();
+        return visitorRepository.findAll().stream()
+                .map(VisitorServiceImpl::toDto)
+                .toList();
     }
 
     @Override
     public VisitorDTO getVisitorById(Long id) {
         Visitor v = visitorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
-        VisitorDTO dto = new VisitorDTO();
-        dto.setId(v.getId());
-        dto.setFullName(v.getFullName());
-        dto.setEmail(v.getEmail());
-        dto.setPhone(v.getPhone());
-        dto.setIdProofNumber(v.getIdProofNumber());
-        return dto;
+        return toDto(v);
     }
 
     @Override
@@ -70,9 +52,8 @@ public class VisitorServiceImpl implements VisitorService {
         v.setEmail(visitorDTO.getEmail());
         v.setPhone(visitorDTO.getPhone());
         v.setIdProofNumber(visitorDTO.getIdProofNumber());
-        visitorRepository.save(v);
-        visitorDTO.setId(v.getId());
-        return visitorDTO;
+        Visitor saved = visitorRepository.save(v);
+        return toDto(saved);
     }
 
     @Override
@@ -83,14 +64,31 @@ public class VisitorServiceImpl implements VisitorService {
         visitorRepository.deleteById(id);
     }
 
-    // Helper used by tests to get entity directly: visitorService.getVisitor(long)
+    // Helper used by tests: visitorService.getVisitor(long)
     public Visitor getVisitor(long id) {
         return visitorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
     }
 
-    // Existing helper (optional, can stay)
-    public Visitor getVisitorEntity(Long id) {
-        return getVisitor(id);
+    // Static helpers so tests can easily convert if they want
+
+    public static VisitorDTO toDto(Visitor v) {
+        VisitorDTO dto = new VisitorDTO();
+        dto.setId(v.getId());
+        dto.setFullName(v.getFullName());
+        dto.setEmail(v.getEmail());
+        dto.setPhone(v.getPhone());
+        dto.setIdProofNumber(v.getIdProofNumber());
+        return dto;
+    }
+
+    public static Visitor fromDto(VisitorDTO dto) {
+        Visitor v = new Visitor();
+        v.setId(dto.getId());
+        v.setFullName(dto.getFullName());
+        v.setEmail(dto.getEmail());
+        v.setPhone(dto.getPhone());
+        v.setIdProofNumber(dto.getIdProofNumber());
+        return v;
     }
 }

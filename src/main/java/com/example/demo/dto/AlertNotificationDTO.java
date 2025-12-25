@@ -1,8 +1,10 @@
 package com.example.demo.dto;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
+
+import com.example.demo.entity.AlertNotification;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -10,14 +12,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AlertNotificationDTO {
     private Long id;
-
     private Long visitLogId;
-
-    @NotBlank(message = "Sent to is required")
-    private String sentTo;
-
-    @NotBlank(message = "Alert message is required")
     private String alertMessage;
-
+    private String sentTo;
     private LocalDateTime sentAt;
+
+    public AlertNotificationDTO(AlertNotification alert) {
+        this.id = alert.getId();
+        this.visitLogId = alert.getVisitLog() != null ? alert.getVisitLog().getId() : null;
+        this.alertMessage = alert.getAlertMessage();
+        this.sentTo = alert.getSentTo();
+        this.sentAt = alert.getSentAt();
+    }
 }
