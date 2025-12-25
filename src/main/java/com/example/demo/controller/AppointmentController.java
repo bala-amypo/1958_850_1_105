@@ -1,4 +1,5 @@
 package com.example.demo.controller;
+import com.example.demo.dto.ApiResponse;
 
 import com.example.demo.dto.AppointmentDTO;
 import com.example.demo.entity.Appointment;
