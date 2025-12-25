@@ -1,16 +1,13 @@
 package com.example.demo.entity;
+
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import java.time.LocalDate;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "appointments")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,18 +21,10 @@ public class Appointment {
     @JoinColumn(name = "host_id", nullable = false)
     private Host host;
 
+    // IMPORTANT: must be LocalDateTime
     @Column(name = "appointment_date", nullable = false)
-    private LocalDate appointmentDate;
+    private LocalDateTime appointmentDate;
 
-    @NotBlank
-    @Column(name = "purpose", nullable = false)
     private String purpose;
-
-    @Column(name = "status", nullable = false)
-    private String status = "SCHEDULED";
-
-    @PrePersist
-    protected void onCreate() {
-        if (this.status == null) this.status = "SCHEDULED";
-    }
+    private String status;
 }
