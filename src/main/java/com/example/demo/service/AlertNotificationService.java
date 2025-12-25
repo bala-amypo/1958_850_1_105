@@ -1,9 +1,10 @@
 package com.example.demo.service;
-
-import com.example.demo.entity.AlertNotification;
+import com.example.demo.dto.AlertNotificationDTO;
 import java.util.List;
 
 public interface AlertNotificationService {
-    List<AlertNotification> getAllAlerts();
-    AlertNotification createAlert(AlertNotification alert);
+    AlertNotificationDTO sendAlert(Long visitLogId, AlertNotificationDTO alertDTO);
+    List<AlertNotificationDTO> getAllAlerts();
+    AlertNotificationDTO getAlertById(Long id);
+    AlertNotificationDTO getAlertByVisitLogId(Long visitLogId);
 }

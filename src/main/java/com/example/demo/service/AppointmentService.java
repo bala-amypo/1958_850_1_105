@@ -1,9 +1,13 @@
 package com.example.demo.service;
-
-import com.example.demo.entity.Appointment;
+import com.example.demo.dto.AppointmentDTO;
 import java.util.List;
 
 public interface AppointmentService {
-    List<Appointment> getAppointmentsForVisitor(long visitorId);
-    Appointment createAppointment(Appointment appointment);
+    AppointmentDTO createAppointment(AppointmentDTO appointmentDTO);
+    List<AppointmentDTO> getAllAppointments();
+    AppointmentDTO getAppointmentById(Long id);
+    List<AppointmentDTO> getAppointmentsByHostId(Long hostId);
+    List<AppointmentDTO> getAppointmentsByVisitorId(Long visitorId);
+    AppointmentDTO updateAppointment(Long id, AppointmentDTO appointmentDTO);
+    void deleteAppointment(Long id);
 }

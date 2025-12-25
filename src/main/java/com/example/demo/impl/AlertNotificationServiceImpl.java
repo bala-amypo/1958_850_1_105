@@ -1,74 +1,70 @@
 package com.example.demo.service.impl;
-import com.example.demo.dto.RegisterRequest;
-import com.example.demo.dto.AuthRequest;
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.entity.User;
+import com.example.demo.dto.AlertNotificationDTO;
+import com.example.demo.entity.AlertNotification;
+import com.example.demo.entity.VisitLog;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.exception.BadRequestException;
-import com.example.demo.repository.UserRepository;
-import com.example.demo.security.JwtUtil;
-import com.example.demo.service.UserService;
+import com.example.demo.repository.AlertNotificationRepository;
+import com.example.demo.repository.VisitLogRepository;
+import com.example.demo.service.AlertNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class AlertNotificationServiceImpl implements AlertNotificationService {
     @Autowired
-    private UserRepository userRepository;
+    private AlertNotificationRepository alertNotificationRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private VisitLogRepository visitLogRepository;
 
     @Override
-    public AuthResponse register(RegisterRequest registerRequest) {
-        if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
-            throw new BadRequestException("Username already exists");
+    public AlertNotificationDTO sendAlert(Long visitLogId, AlertNotificationDTO alertDTO) {
+        VisitLog visitLog = visitLogRepository.findById(visitLogId)
+                .orElseThrow(() -> new ResourceNotFoundException("Visit log not found"));
+
+        // Check if alert already sent for this visit
+        if (alertNotificationRepository.findByVisitLogId(visitLogId).isPresent()) {
+            throw new BadRequestException("Alert already sent for this visit");
         }
-        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
-            throw new BadRequestException("Email already exists");
-        }
 
-        User user = new User();
-        user.setUsername(registerRequest.getUsername());
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setRole(registerRequest.getRole() != null ? registerRequest.getRole() : "USER");
+        AlertNotification alertNotification = new AlertNotification();
+        alertNotification.setVisitLog(visitLog);
+        alertNotification.setSentTo(alertDTO.getSentTo());
+        alertNotification.setAlertMessage(alertDTO.getAlertMessage());
 
-        User savedUser = userRepository.save(user);
-        String token = jwtUtil.generateToken(savedUser.getUsername());
+        AlertNotification savedAlert = alertNotificationRepository.save(alertNotification);
+        visitLog.setAlertSent(true);
+        visitLogRepository.save(visitLog);
 
-        return new AuthResponse(token, savedUser.getUsername(), savedUser.getRole(),
-                "User registered successfully");
+        return mapToDTO(savedAlert);
     }
 
     @Override
-    public AuthResponse login(AuthRequest authRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            authRequest.getUsername(),
-                            authRequest.getPassword()
-                    )
-            );
+    public List<AlertNotificationDTO> getAllAlerts() {
+        return alertNotificationRepository.findAll().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
 
-            User user = userRepository.findByUsername(authRequest.getUsername())
-                    .orElseThrow(() -> new BadRequestException("User not found"));
+    @Override
+    public AlertNotificationDTO getAlertById(Long id) {
+        AlertNotification alert = alertNotificationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Alert not found with id: " + id));
+        return mapToDTO(alert);
+    }
 
-            String token = jwtUtil.generateToken(user.getUsername());
+    @Override
+    public AlertNotificationDTO getAlertByVisitLogId(Long visitLogId) {
+        AlertNotification alert = alertNotificationRepository.findByVisitLogId(visitLogId)
+                .orElseThrow(() -> new ResourceNotFoundException("Alert not found for visit log id: " + visitLogId));
+        return mapToDTO(alert);
+    }
 
-            return new AuthResponse(token, user.getUsername(), user.getRole(),
-                    "Login successful");
-        } catch (Exception e) {
-            throw new BadRequestException("Invalid username or password");
-        }
+    private AlertNotificationDTO mapToDTO(AlertNotification alert) {
+        return new AlertNotificationDTO(alert.getId(), alert.getVisitLog().getId(),
+                alert.getSentTo(), alert.getAlertMessage(), alert.getSentAt());
     }
 }
