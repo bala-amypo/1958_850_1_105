@@ -1,31 +1,41 @@
 package com.example.demo.entity;
-
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 
 @Entity
+@Table(name = "appointments")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long visitorId;
-    private Long hostId;
-    private LocalDateTime appointmentTime;
 
-    public Appointment() {}
-    public Appointment(Long visitorId, Long hostId, LocalDateTime appointmentTime) {
-        this.visitorId = visitorId;
-        this.hostId = hostId;
-        this.appointmentTime = appointmentTime;
+    @ManyToOne
+    @JoinColumn(name = "visitor_id", nullable = false)
+    private Visitor visitor;
+
+    @ManyToOne
+    @JoinColumn(name = "host_id", nullable = false)
+    private Host host;
+
+    @Column(nullable = false)
+    private LocalDate appointmentDate;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String purpose;
+
+    @Column(nullable = false)
+    private String status = "SCHEDULED";
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.status == null) this.status = "SCHEDULED";
     }
-
-    // getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Long getVisitorId() { return visitorId; }
-    public void setVisitorId(Long visitorId) { this.visitorId = visitorId; }
-    public Long getHostId() { return hostId; }
-    public void setHostId(Long hostId) { this.hostId = hostId; }
-    public LocalDateTime getAppointmentTime() { return appointmentTime; }
-    public void setAppointmentTime(LocalDateTime appointmentTime) { this.appointmentTime = appointmentTime; }
 }

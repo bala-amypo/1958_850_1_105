@@ -1,27 +1,38 @@
 package com.example.demo.entity;
-
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "alert_notifications")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AlertNotification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String message;
-    private LocalDateTime createdAt;
 
-    public AlertNotification() {}
-    public AlertNotification(String message) {
-        this.message = message;
-        this.createdAt = LocalDateTime.now();
+    @OneToOne
+    @JoinColumn(name = "visit_log_id", nullable = false, unique = true)
+    private VisitLog visitLog;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String sentTo;
+
+    @NotBlank
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String alertMessage;
+
+    @Column(nullable = false)
+    private LocalDateTime sentAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.sentAt = LocalDateTime.now();
     }
-
-    // getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

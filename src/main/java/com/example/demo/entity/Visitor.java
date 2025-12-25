@@ -1,26 +1,43 @@
 package com.example.demo.entity;
-
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "visitors")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Visitor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String fullName;
+
+    @Email
+    @Column(nullable = true)
     private String email;
 
-    public Visitor() {}
-    public Visitor(String name, String email) {
-        this.name = name;
-        this.email = email;
-    }
+    @NotBlank
+    @Column(nullable = false)
+    private String phone;
 
-    // getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    @NotBlank
+    @Column(nullable = false)
+    private String idProofNumber;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
