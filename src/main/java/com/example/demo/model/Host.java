@@ -1,8 +1,8 @@
 package com.example.demo.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "hosts")
@@ -11,19 +11,20 @@ public class Host {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotBlank
+    @NotBlank(message = "Host name is required")
     private String hostName;
     
-    @Email
-    @NotBlank
+    @NotBlank(message = "Email is required")
+    @Email(message = "Valid email required")
     @Column(unique = true)
     private String email;
     
     private String phone;
     
-    // constructors, getters, setters
+    // constructors
     public Host() {}
     
+    // getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     

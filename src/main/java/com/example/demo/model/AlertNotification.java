@@ -1,6 +1,6 @@
 package com.example.demo.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -10,7 +10,7 @@ public class AlertNotification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "visit_log_id")
     private VisitLog visitLog;
     
@@ -20,9 +20,10 @@ public class AlertNotification {
     
     private LocalDateTime sentAt;
     
-    // constructors, getters, setters
+    // constructors
     public AlertNotification() {}
     
+    // getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     

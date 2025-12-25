@@ -1,6 +1,6 @@
 package com.example.demo.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -10,11 +10,11 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "visitor_id")
     private Visitor visitor;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "host_id")
     private Host host;
     
@@ -24,9 +24,10 @@ public class Appointment {
     
     private String status = "SCHEDULED";
     
-    // constructors, getters, setters
+    // constructors
     public Appointment() {}
     
+    // getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     
