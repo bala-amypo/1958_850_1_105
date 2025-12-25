@@ -5,6 +5,8 @@ import com.example.demo.dto.VisitLogDTO;
 import com.example.demo.entity.Appointment;
 import com.example.demo.entity.VisitLog;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +40,8 @@ public class DTOConverter {
             dto.setVisitorId(appointment.getVisitor().getId());
         if (appointment.getHost() != null && appointment.getHost().getId() != null)
             dto.setHostId(appointment.getHost().getId());
-        dto.setAppointmentDate(appointment.getAppointmentDate());
+        LocalDateTime dt = appointment.getAppointmentDate();
+        dto.setAppointmentDate(dt != null ? dt.toLocalDate() : null);
         dto.setPurpose(appointment.getPurpose());
         dto.setStatus(appointment.getStatus());
         return dto;
@@ -48,5 +51,10 @@ public class DTOConverter {
         return appointments.stream()
                 .map(DTOConverter::toAppointmentDTO)
                 .collect(Collectors.toList());
+    }
+
+    // Helper for controllers/services: convert DTO date -> entity date-time
+    public static LocalDateTime toDateTime(LocalDate date) {
+        return date != null ? date.atStartOfDay() : null;
     }
 }
