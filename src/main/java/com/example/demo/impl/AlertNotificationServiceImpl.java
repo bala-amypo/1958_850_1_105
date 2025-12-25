@@ -4,6 +4,7 @@ import com.example.demo.entity.AlertNotification;
 import com.example.demo.repository.AlertNotificationRepository;
 import com.example.demo.service.AlertNotificationService;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -16,12 +17,12 @@ public class AlertNotificationServiceImpl implements AlertNotificationService {
     }
 
     @Override
-    public AlertNotification createAlert(AlertNotification alertNotification) {
-        return repository.save(alertNotification);
+    public List<AlertNotification> getAllAlerts() {
+        return repository.findAll();
     }
 
     @Override
-    public List<AlertNotification> getAllAlerts() {
-        return repository.findAll();
+    public AlertNotification createAlert(AlertNotification alert) {
+        return repository.save(alert);
     }
 }
