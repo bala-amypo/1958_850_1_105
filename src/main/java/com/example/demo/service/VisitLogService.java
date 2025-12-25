@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import com.example.demo.model.VisitLog;
-
 import java.util.List;
 
 public interface VisitLogService {
@@ -11,6 +10,4 @@ public interface VisitLogService {
     VisitLog checkOutVisitor(Long visitLogId);
 
     List<VisitLog> getActiveVisits();
-
-    VisitLog getVisitLog(Long id);
 }

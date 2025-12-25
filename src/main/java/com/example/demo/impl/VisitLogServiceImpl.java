@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.model.*;
 import com.example.demo.repository.*;
+import com.example.demo.service.VisitLogService;
 import com.example.demo.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class VisitLogServiceImpl {
+public class VisitLogServiceImpl implements VisitLogService {
 
     private final VisitLogRepository visitLogRepository;
     private final VisitorRepository visitorRepository;
@@ -24,6 +25,7 @@ public class VisitLogServiceImpl {
         this.hostRepository = hostRepository;
     }
 
+    @Override
     public VisitLog checkInVisitor(Long visitorId, Long hostId, String purpose) {
 
         Visitor visitor = visitorRepository.findById(visitorId)
@@ -41,7 +43,9 @@ public class VisitLogServiceImpl {
         return visitLogRepository.save(log);
     }
 
+    @Override
     public VisitLog checkOutVisitor(Long visitLogId) {
+
         VisitLog log = visitLogRepository.findById(visitLogId)
                 .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
 
@@ -53,6 +57,7 @@ public class VisitLogServiceImpl {
         return visitLogRepository.save(log);
     }
 
+    @Override
     public List<VisitLog> getActiveVisits() {
         return visitLogRepository.findByCheckOutTimeIsNull();
     }
