@@ -4,132 +4,73 @@ import com.example.demo.dto.AppointmentDTO;
 import com.example.demo.entity.Appointment;
 import com.example.demo.entity.Host;
 import com.example.demo.entity.Visitor;
-import com.example.demo.exception.BadRequestException;
-import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.AppointmentRepository;
 import com.example.demo.repository.HostRepository;
 import com.example.demo.repository.VisitorRepository;
 import com.example.demo.service.AppointmentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class AppointmentServiceImpl implements AppointmentService {
 
-    @Autowired
-    private AppointmentRepository appointmentRepository;
-
-    @Autowired
-    private VisitorRepository visitorRepository;
-
-    @Autowired
-    private HostRepository hostRepository;
-
-    // No‑arg constructor for hidden tests
-    public AppointmentServiceImpl() {
-    }
+    private final AppointmentRepository appointmentRepository;
+    private final HostRepository hostRepository;
+    private final VisitorRepository visitorRepository;
 
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository,
-                                  VisitorRepository visitorRepository,
-                                  HostRepository hostRepository) {
+                                  HostRepository hostRepository,
+                                  VisitorRepository visitorRepository) {
         this.appointmentRepository = appointmentRepository;
-        this.visitorRepository = visitorRepository;
         this.hostRepository = hostRepository;
+        this.visitorRepository = visitorRepository;
     }
 
     @Override
-    public AppointmentDTO createAppointment(AppointmentDTO appointmentDTO) {
-        if (appointmentDTO.getAppointmentDate().isBefore(LocalDate.now())) {
-            throw new BadRequestException("Appointment date cannot be in the past");
-        }
-
-        Visitor visitor = visitorRepository.findById(appointmentDTO.getVisitorId())
-                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
-        Host host = hostRepository.findById(appointmentDTO.getHostId())
-                .orElseThrow(() -> new ResourceNotFoundException("Host not found"));
+    public AppointmentDTO createAppointment(AppointmentDTO dto) {
+        Host host = hostRepository.findById(dto.getHostId())
+                .orElseThrow(() -> new IllegalArgumentException("Host not found"));
+        Visitor visitor = visitorRepository.findById(dto.getVisitorId())
+                .orElseThrow(() -> new IllegalArgumentException("Visitor not found"));
 
         Appointment appointment = new Appointment();
-        appointment.setVisitor(visitor);
+        appointment.setId(dto.getId());
         appointment.setHost(host);
-        appointment.setAppointmentDate(appointmentDTO.getAppointmentDate());
-        appointment.setPurpose(appointmentDTO.getPurpose());
-        appointment.setStatus("SCHEDULED");
+        appointment.setVisitor(visitor);
+        appointment.setAppointmentDate(dto.getAppointmentDate());
+        appointment.setPurpose(dto.getPurpose());
+        appointment.setStatus(dto.getStatus());
 
-        Appointment savedAppointment = appointmentRepository.save(appointment);
-        return mapToDTO(savedAppointment);
+        Appointment saved = appointmentRepository.save(appointment);
+        return toDto(saved);
     }
 
     @Override
-    public List<AppointmentDTO> getAllAppointments() {
-        return appointmentRepository.findAll().stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public AppointmentDTO getAppointmentById(Long id) {
-        Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + id));
-        return mapToDTO(appointment);
-    }
-
-    @Override
-    public List<AppointmentDTO> getAppointmentsByHostId(Long hostId) {
+    public List<AppointmentDTO> getAppointmentsForHost(long hostId) {
         return appointmentRepository.findByHostId(hostId).stream()
-                .map(this::mapToDTO)
+                .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<AppointmentDTO> getAppointmentsByVisitorId(Long visitorId) {
+    public List<AppointmentDTO> getAppointmentsForVisitor(long visitorId) {
         return appointmentRepository.findByVisitorId(visitorId).stream()
-                .map(this::mapToDTO)
+                .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public AppointmentDTO updateAppointment(Long id, AppointmentDTO appointmentDTO) {
-        Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + id));
-        appointment.setAppointmentDate(appointmentDTO.getAppointmentDate());
-        appointment.setPurpose(appointmentDTO.getPurpose());
-        appointment.setStatus(appointmentDTO.getStatus());
-        Appointment updatedAppointment = appointmentRepository.save(appointment);
-        return mapToDTO(updatedAppointment);
-    }
-
-    @Override
-    public void deleteAppointment(Long id) {
-        if (!appointmentRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Appointment not found with id: " + id);
-        }
-        appointmentRepository.deleteById(id);
-    }
-
-    private AppointmentDTO mapToDTO(Appointment appointment) {
+    private AppointmentDTO toDto(Appointment a) {
         AppointmentDTO dto = new AppointmentDTO();
-        dto.setId(appointment.getId());
-        dto.setVisitorId(appointment.getVisitor().getId());
-        dto.setHostId(appointment.getHost().getId());
-        dto.setAppointmentDate(appointment.getAppointmentDate());
-        dto.setPurpose(appointment.getPurpose());
-        dto.setStatus(appointment.getStatus());
+        dto.setId(a.getId());
+        dto.setHostId(a.getHost().getId());
+        dto.setVisitorId(a.getVisitor().getId());
+        dto.setAppointmentDate(a.getAppointmentDate());
+        dto.setPurpose(a.getPurpose());
+        dto.setStatus(a.getStatus());
         return dto;
-    }
-
-    // --- Extra helper expected by AuthTests ---
-
-    /**
-     * Hidden tests call appointmentService.getAppointment(long).
-     */
-    public Appointment getAppointment(long id) {
-        if (appointmentRepository == null) {
-            return null;
-        }
-        return appointmentRepository.findById(id).orElse(null);
     }
 }
