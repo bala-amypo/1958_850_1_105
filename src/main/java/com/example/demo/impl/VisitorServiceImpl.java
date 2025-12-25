@@ -5,7 +5,6 @@ import com.example.demo.repository.VisitorRepository;
 import com.example.demo.service.VisitorService;
 import com.example.demo.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -13,14 +12,11 @@ public class VisitorServiceImpl implements VisitorService {
 
     private final VisitorRepository visitorRepository;
 
-    public VisitorServiceImpl(VisitorRepository visitorRepository) {
-        this.visitorRepository = visitorRepository;
-    }
+    public VisitorServiceImpl(VisitorRepository visitorRepository) { this.visitorRepository = visitorRepository; }
+    public VisitorServiceImpl() { this.visitorRepository = null; } // no-arg constructor for tests
 
     @Override
-    public Visitor createVisitor(Visitor visitor) {
-        return visitorRepository.save(visitor);
-    }
+    public Visitor createVisitor(Visitor visitor) { return visitorRepository.save(visitor); }
 
     @Override
     public Visitor getVisitorById(Long id) {
@@ -29,7 +25,10 @@ public class VisitorServiceImpl implements VisitorService {
     }
 
     @Override
-    public List<Visitor> getAllVisitors() {
-        return visitorRepository.findAll();
+    public Visitor getVisitor(long id) {
+        return visitorRepository.findById(id).orElse(null);
     }
+
+    @Override
+    public List<Visitor> getAllVisitors() { return visitorRepository.findAll(); }
 }
