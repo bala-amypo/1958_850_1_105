@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.*;
+import com.example.demo.dto.AppointmentDTO;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.*;
 import com.example.demo.service.AppointmentService;
@@ -9,10 +10,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
-    
     AppointmentRepository appointmentRepository;
     VisitorRepository visitorRepository;
     HostRepository hostRepository;
@@ -20,9 +21,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public AppointmentServiceImpl() {}
 
     @Autowired
-    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, 
-                                 VisitorRepository visitorRepository, 
-                                 HostRepository hostRepository) {
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, VisitorRepository visitorRepository, HostRepository hostRepository) {
         this.appointmentRepository = appointmentRepository;
         this.visitorRepository = visitorRepository;
         this.hostRepository = hostRepository;
@@ -30,35 +29,51 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public Appointment createAppointment(Long visitorId, Long hostId, Appointment appointment) {
-        Visitor visitor = visitorRepository.findById(visitorId)
-            .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
-        Host host = hostRepository.findById(hostId)
-            .orElseThrow(() -> new ResourceNotFoundException("Host not found"));
-
+        // Test signature
+        Visitor visitor = visitorRepository.findById(visitorId).orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+        Host host = hostRepository.findById(hostId).orElseThrow(() -> new ResourceNotFoundException("Host not found"));
         appointment.setVisitor(visitor);
         appointment.setHost(host);
         if (appointment.getAppointmentDate().isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("appointmentDate cannot be past");
         }
-        if (appointment.getStatus() == null) {
-            appointment.setStatus("SCHEDULED");
-        }
+        appointment.setStatus("SCHEDULED");
         return appointmentRepository.save(appointment);
     }
 
+    // CONTROLLER METHODS
     @Override
-    public Appointment getAppointment(Long id) {
-        return appointmentRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+    public List<Appointment> getAllAppointments() {
+        return appointmentRepository.findAll();
     }
 
     @Override
-    public List<Appointment> getAppointmentsForHost(Long hostId) {
+    public Appointment getAppointmentById(Long id) {
+        return appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+    }
+
+    @Override
+    public List<Appointment> getAppointmentsByHostId(Long hostId) {
         return appointmentRepository.findByHostId(hostId);
     }
 
     @Override
-    public List<Appointment> getAppointmentsForVisitor(Long visitorId) {
+    public List<Appointment> getAppointmentsByVisitorId(Long visitorId) {
         return appointmentRepository.findByVisitorId(visitorId);
+    }
+
+    @Override
+    public Appointment updateAppointment(Long id, AppointmentDTO dto) {
+        Appointment appointment = getAppointmentById(id);
+        // Update logic
+        return appointmentRepository.save(appointment);
+    }
+
+    @Override
+    public void deleteAppointment(Long id) {
+        if (!appointmentRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Appointment not found");
+        }
+        appointmentRepository.deleteById(id);
     }
 }
