@@ -2,85 +2,43 @@ package com.example.demo.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.function.Function;
+import java.util.Map;
 
 @Component
 public class JwtUtil {
-
-    public String secret;
-    public Long jwtExpirationMs;
-
-    public JwtUtil() {
+    
+    @Value("${app.jwtSecret:0123456789ABCDEF0123456789ABCDEF}")
+    private String secret;
+    
+    @Value("${app.jwtExpirationMs:3600000}")
+    private long jwtExpirationMs;
+    
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
-
+    
     public String generateToken(String username, String role, Long userId, String email) {
         return Jwts.builder()
-                .setSubject(username)
-                .claim("role", role)
-                .claim("userId", userId)
-                .claim("email", email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .claims(Map.of("role", role, "userId", userId, "email", email))
+                .subject(username)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(getSigningKey())
                 .compact();
     }
-
-    // FOR TESTS - 2 params
-    public String generateToken(String username, String role) {
-        return Jwts.builder()
-                .setSubject(username)
-                .claim("role", role)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    public Claims validateAndGetClaims(String token) {
+    
+    public JwtParser validateAndGetClaims(String token) {
         try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(getSignInKey())
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
                     .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (Exception e) {
-            throw new JwtException("Invalid JWT token");
+                    .parseSignedClaims(token);
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new RuntimeException("Invalid JWT token", e);
         }
-    }
-
-    // Helper so tests can effectively do "claims.getBody()" via JwtUtil
-    public Claims getBody(Claims claims) {
-        return claims;
-    }
-
-    // JWTAuthenticationFilter expects these EXACT methods
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    public boolean isTokenValid(String token, String username) {
-        final String usernameFromToken = extractUsername(token);
-        return (usernameFromToken.equals(username) && !isTokenExpired(token));
-    }
-
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = validateAndGetClaims(token);
-        return claimsResolver.apply(claims);
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    private SecretKey getSignInKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 }

@@ -1,11 +1,10 @@
 package com.example.demo.service;
-import com.example.demo.dto.VisitorDTO;
+
+import com.example.demo.model.Visitor;
 import java.util.List;
 
 public interface VisitorService {
-    VisitorDTO createVisitor(VisitorDTO visitorDTO);
-    List<VisitorDTO> getAllVisitors();
-    VisitorDTO getVisitorById(Long id);
-    VisitorDTO updateVisitor(Long id, VisitorDTO visitorDTO);
-    void deleteVisitor(Long id);
+    Visitor createVisitor(Visitor visitor);
+    Visitor getVisitor(Long id);
+    List<Visitor> getAllVisitors();
 }
