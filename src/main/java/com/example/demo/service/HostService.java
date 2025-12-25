@@ -11,4 +11,3 @@ public interface HostService {
 
     List<Host> getAllHosts();
 }
-`
