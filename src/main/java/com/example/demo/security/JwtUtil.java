@@ -9,19 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 
-// Wrapper class to mimic getBody() for tests
-class ClaimsWrapper {
-    private final Claims claims;
-
-    public ClaimsWrapper(Claims claims) {
-        this.claims = claims;
-    }
-
-    public Claims getBody() {
-        return claims;
-    }
-}
-
 @Component
 public class JwtUtil {
 
@@ -29,7 +16,6 @@ public class JwtUtil {
             "ThisIsAVeryStrongJwtSecretKeyWithMoreThan32Chars!".getBytes()
     );
 
-    // generate token (single arg)
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -37,7 +23,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    // generate token (4 args) for AuthTests
     public String generateToken(String username, String role, Long id, String email) {
         return Jwts.builder()
                 .setSubject(username)
@@ -48,7 +33,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    // validate token and return ClaimsWrapper with getBody()
+    // Now returns public ClaimsWrapper
     public ClaimsWrapper validateAndGetClaims(String token) {
         Jws<Claims> jws = Jwts.parserBuilder()
                 .setSigningKey(key)
