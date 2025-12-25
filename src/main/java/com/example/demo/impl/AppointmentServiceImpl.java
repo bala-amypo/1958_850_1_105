@@ -1,25 +1,27 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.model.Appointment;
-import com.example.demo.model.Visitor;
-import com.example.demo.model.Host;
+import com.example.demo.entity.Appointment;
+import com.example.demo.entity.Visitor;
+import com.example.demo.entity.Host;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.AppointmentRepository;
 import com.example.demo.repository.VisitorRepository;
 import com.example.demo.repository.HostRepository;
 import com.example.demo.service.AppointmentService;
-import com.example.demo.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
+@Transactional
 public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
     private final VisitorRepository visitorRepository;
     private final HostRepository hostRepository;
 
-    // constructor required by test cases
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository,
                                   VisitorRepository visitorRepository,
                                   HostRepository hostRepository) {
@@ -28,33 +30,34 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.hostRepository = hostRepository;
     }
 
-    // no-arg constructor required by test cases
-    public AppointmentServiceImpl() {
-        this.appointmentRepository = null;
-        this.visitorRepository = null;
-        this.hostRepository = null;
-    }
-
     @Override
     public Appointment createAppointment(Appointment appointment) {
+        if (appointment.getDate().before(new Date())) {
+            throw new IllegalArgumentException("Appointment date cannot be in the past");
+        }
+
+        // Ensure Visitor exists
+        Visitor visitor = visitorRepository.findById(appointment.getVisitor().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+        appointment.setVisitor(visitor);
+
+        // Ensure Host exists
+        Host host = hostRepository.findById(appointment.getHost().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Host not found"));
+        appointment.setHost(host);
+
+        // Default status
+        if (appointment.getStatus() == null) {
+            appointment.setStatus(Appointment.Status.SCHEDULED);
+        }
+
         return appointmentRepository.save(appointment);
     }
 
     @Override
-    public Appointment createAppointment(long visitorId, long hostId, Appointment appointment) {
-        // For test case compatibility, we can just save the appointment
-        return appointmentRepository.save(appointment);
-    }
-
-    @Override
-    public Appointment getAppointmentById(Long id) {
+    public Appointment getAppointment(Long id) {
         return appointmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
-    }
-
-    @Override
-    public Appointment getAppointment(long id) {
-        return appointmentRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -65,17 +68,5 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public List<Appointment> getAppointmentsByVisitor(Long visitorId) {
         return appointmentRepository.findByVisitorId(visitorId);
-    }
-
-    @Override
-    public List<Appointment> getAppointmentsForHost(long hostId) {
-        // Added for test cases
-        return appointmentRepository.findAll();
-    }
-
-    @Override
-    public List<Appointment> getAppointmentsForVisitor(long visitorId) {
-        // Added for test cases
-        return appointmentRepository.findAll();
     }
 }
