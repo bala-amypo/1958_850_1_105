@@ -14,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -35,10 +33,8 @@ public class AppointmentController {
             @Valid @RequestBody AppointmentDTO appointmentDTO) {
 
         Appointment appointment = new Appointment();
-        // Convert LocalDate (DTO) -> LocalDateTime (entity)
-        LocalDate date = appointmentDTO.getAppointmentDate();
-        LocalDateTime dateTime = date != null ? date.atStartOfDay() : null;
-        appointment.setAppointmentDate(dateTime);
+        // DTO and entity both use LocalDateTime now
+        appointment.setAppointmentDate(appointmentDTO.getAppointmentDate());
         appointment.setPurpose(appointmentDTO.getPurpose());
         appointment.setStatus("SCHEDULED");
 
@@ -51,7 +47,8 @@ public class AppointmentController {
     @GetMapping
     @Operation(summary = "Get all appointments")
     public ResponseEntity<ApiResponse> getAllAppointments() {
-        List<AppointmentDTO> appointments = DTOConverter.toAppointmentDTOList(appointmentService.getAllAppointments());
+        List<AppointmentDTO> appointments =
+                DTOConverter.toAppointmentDTOList(appointmentService.getAllAppointments());
         return ResponseEntity.ok(new ApiResponse(true, "Appointments retrieved successfully", appointments));
     }
 
@@ -65,14 +62,16 @@ public class AppointmentController {
     @GetMapping("/host/{hostId}")
     @Operation(summary = "Get appointments by host ID")
     public ResponseEntity<ApiResponse> getAppointmentsByHostId(@PathVariable Long hostId) {
-        List<AppointmentDTO> appointments = DTOConverter.toAppointmentDTOList(appointmentService.getAppointmentsByHostId(hostId));
+        List<AppointmentDTO> appointments =
+                DTOConverter.toAppointmentDTOList(appointmentService.getAppointmentsByHostId(hostId));
         return ResponseEntity.ok(new ApiResponse(true, "Host appointments retrieved successfully", appointments));
     }
 
     @GetMapping("/visitor/{visitorId}")
     @Operation(summary = "Get appointments by visitor ID")
     public ResponseEntity<ApiResponse> getAppointmentsByVisitorId(@PathVariable Long visitorId) {
-        List<AppointmentDTO> appointments = DTOConverter.toAppointmentDTOList(appointmentService.getAppointmentsByVisitorId(visitorId));
+        List<AppointmentDTO> appointments =
+                DTOConverter.toAppointmentDTOList(appointmentService.getAppointmentsByVisitorId(visitorId));
         return ResponseEntity.ok(new ApiResponse(true, "Visitor appointments retrieved successfully", appointments));
     }
 }
