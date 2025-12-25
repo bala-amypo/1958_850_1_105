@@ -25,7 +25,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthResponse register(RegisterRequest request) {
-        // FIXED: Use getEmail() and getPassword()
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
@@ -39,9 +38,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthResponse login(AuthRequest request) {
-        // FIXED: Use getEmail() and getPassword()
-        User user = userRepository.findByEmail(request.email())
-
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
