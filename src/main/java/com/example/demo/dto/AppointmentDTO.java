@@ -14,7 +14,7 @@ public class AppointmentDTO {
     private Long id;
     private Long visitorId;
     private Long hostId;
-    private LocalDateTime appointmentDate;   // LocalDateTime (matches entity)
+    private LocalDateTime appointmentDate;   // LocalDateTime only
     private String purpose;
     private String status;
 
@@ -22,7 +22,7 @@ public class AppointmentDTO {
         this.id = a.getId();
         this.visitorId = a.getVisitor() != null ? a.getVisitor().getId() : null;
         this.hostId = a.getHost() != null ? a.getHost().getId() : null;
-        this.appointmentDate = a.getAppointmentDate();   // no conversion
+        this.appointmentDate = a.getAppointmentDate();   // LocalDateTime
         this.purpose = a.getPurpose();
         this.status = a.getStatus();
     }

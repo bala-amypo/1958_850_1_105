@@ -33,7 +33,7 @@ public class AppointmentController {
             @Valid @RequestBody AppointmentDTO appointmentDTO) {
 
         Appointment appointment = new Appointment();
-        // DTO and entity both use LocalDateTime now
+        // DTO and entity both use LocalDateTime
         appointment.setAppointmentDate(appointmentDTO.getAppointmentDate());
         appointment.setPurpose(appointmentDTO.getPurpose());
         appointment.setStatus("SCHEDULED");
