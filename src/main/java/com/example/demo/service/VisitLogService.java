@@ -1,14 +1,11 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.VisitLogDTO;
+import com.example.demo.entity.VisitLog;
 import java.util.List;
 
 public interface VisitLogService {
-    VisitLogDTO checkInVisitor(VisitLogDTO dto);
-    VisitLogDTO checkOutVisitor(Long id);
-    List<VisitLogDTO> getAllVisitLogs();
-    VisitLogDTO getVisitLogById(Long id);
-    List<VisitLogDTO> getActiveVisits();
-    List<VisitLogDTO> getVisitLogsByHostId(Long hostId);
-    List<VisitLogDTO> getVisitLogsByVisitorId(Long visitorId);
+    VisitLog checkInVisitor(Long visitorId, Long hostId, String purpose);
+    VisitLog checkOutVisitor(Long visitLogId);
+    List<VisitLog> getActiveVisits();
+    VisitLog getVisitLog(Long id);
 }

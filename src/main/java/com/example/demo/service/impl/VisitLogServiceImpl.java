@@ -13,12 +13,12 @@ import java.util.List;
 @Service
 public class VisitLogServiceImpl implements VisitLogService {
     
-    // EXACT field names for test reflection
+    // EXACT field names tests expect via reflection
     VisitLogRepository visitLogRepository;
     VisitorRepository visitorRepository;
     HostRepository hostRepository;
 
-    // NO-ARG CONSTRUCTOR (tests expect this)
+    // NO-ARG constructor (tests call new VisitLogServiceImpl())
     public VisitLogServiceImpl() {}
 
     // Spring constructor injection
@@ -33,7 +33,6 @@ public class VisitLogServiceImpl implements VisitLogService {
 
     @Override
     public VisitLog checkInVisitor(Long visitorId, Long hostId, String purpose) {
-        // Test expects this signature - NOT DTO
         Visitor visitor = visitorRepository.findById(visitorId)
             .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
         Host host = hostRepository.findById(hostId)
