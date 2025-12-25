@@ -1,8 +1,6 @@
 package com.example.demo.security;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,13 +48,13 @@ public class JwtUtil {
                 .compact();
     }
     
-    // EXACTLY matches test expectations: returns ParsedClaimsJws with .getBody()
-    public io.jsonwebtoken.JwtParser validateAndGetClaims(String token) {
+    // EXACT TEST EXPECTATION: returns Jws<Claims> so .getBody() works
+    public io.jsonwebtoken.Jws<io.jsonwebtoken.Claims> validateAndGetClaims(String token) {
         try {
             return Jwts.parser()
                     .setSigningKey(getSigningKey())
                     .parseClaimsJws(token);
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Invalid JWT token", e);
         }
     }
