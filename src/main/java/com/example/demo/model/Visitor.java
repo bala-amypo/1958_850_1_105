@@ -1,8 +1,8 @@
 package com.example.demo.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "visitors")
@@ -11,20 +11,21 @@ public class Visitor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @NotBlank
+    @NotBlank(message = "Full name is required")
     private String fullName;
     
-    @Pattern(regexp = "^[6-9]\\d{9}$")
+    @Pattern(regexp = "^[6-9]\\d{9}$", message = "Phone must be 10 digits starting with 6-9")
     private String phone;
     
-    @NotBlank
+    @NotBlank(message = "ID proof number is required")
     private String idProofNumber;
     
     private String email;
     
-    // constructors, getters, setters
+    // constructors
     public Visitor() {}
     
+    // getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     
