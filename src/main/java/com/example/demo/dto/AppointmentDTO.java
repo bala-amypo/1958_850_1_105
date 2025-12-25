@@ -11,10 +11,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AppointmentDTO {
+
     private Long id;
     private Long visitorId;
     private Long hostId;
-    private LocalDateTime appointmentDate;   // LocalDateTime only
+    private LocalDateTime appointmentDate;
     private String purpose;
     private String status;
 
@@ -22,7 +23,12 @@ public class AppointmentDTO {
         this.id = a.getId();
         this.visitorId = a.getVisitor() != null ? a.getVisitor().getId() : null;
         this.hostId = a.getHost() != null ? a.getHost().getId() : null;
-        this.appointmentDate = a.getAppointmentDate();   // LocalDateTime
+
+        // ✅ FIX HERE
+        this.appointmentDate = a.getAppointmentDate() != null
+                ? a.getAppointmentDate().atStartOfDay()
+                : null;
+
         this.purpose = a.getPurpose();
         this.status = a.getStatus();
     }
