@@ -26,7 +26,7 @@ public class VisitLogServiceImpl implements VisitLogService {
         this.hostRepository = hostRepository;
     }
 
-    @Override
+    // FIXED: Correct method signature from interface
     public VisitLogDTO checkInVisitor(Long visitorId, Long hostId, String purpose) {
         Visitor visitor = visitorRepository.findById(visitorId)
                 .orElseThrow(() -> new RuntimeException("Visitor not found"));
@@ -43,7 +43,6 @@ public class VisitLogServiceImpl implements VisitLogService {
         return new VisitLogDTO(saved.getId(), visitorId, hostId, saved.getCheckInTime(), null, purpose, true, false);
     }
 
-    @Override
     public VisitLogDTO checkOutVisitor(Long visitLogId) {
         VisitLog visitLog = visitLogRepository.findById(visitLogId)
                 .orElseThrow(() -> new RuntimeException("VisitLog not found"));
@@ -57,7 +56,6 @@ public class VisitLogServiceImpl implements VisitLogService {
                               saved.getAccessGranted(), saved.getAlertSent());
     }
 
-    @Override
     public List<VisitLogDTO> getActiveVisits() {
         return visitLogRepository.findByCheckOutTimeIsNull()
                 .stream()
@@ -65,14 +63,20 @@ public class VisitLogServiceImpl implements VisitLogService {
                 .collect(Collectors.toList());
     }
 
-    @Override
     public VisitLogDTO getVisitLogById(Long id) {
         VisitLog visitLog = visitLogRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("VisitLog not found"));
         return toDTO(visitLog);
     }
 
-    @Override
+    // REQUIRED by interface
+    public List<VisitLogDTO> getAllVisitLogs() {
+        return visitLogRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
     public List<VisitLogDTO> getVisitLogsByVisitorId(Long visitorId) {
         return visitLogRepository.findByVisitorId(visitorId)
                 .stream()
@@ -80,7 +84,6 @@ public class VisitLogServiceImpl implements VisitLogService {
                 .collect(Collectors.toList());
     }
 
-    @Override
     public List<VisitLogDTO> getVisitLogsByHostId(Long hostId) {
         return visitLogRepository.findByHostId(hostId)
                 .stream()
