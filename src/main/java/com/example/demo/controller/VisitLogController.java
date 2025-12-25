@@ -60,4 +60,33 @@ public class VisitLogController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get visit log by ID")
-    public Response
+    public ResponseEntity<ApiResponse> getVisitLogById(@PathVariable Long id) {
+        VisitLog log = visitLogService.getVisitLogById(id);
+        VisitLogDTO body = DTOConverter.toVisitLogDTO(log);
+        return ResponseEntity.ok(new ApiResponse(true, "Visit log retrieved successfully", body));
+    }
+
+    @GetMapping("/active")
+    @Operation(summary = "Get all active visits")
+    public ResponseEntity<ApiResponse> getActiveVisits() {
+        List<VisitLog> logs = visitLogService.getActiveVisits();
+        List<VisitLogDTO> body = DTOConverter.toVisitLogDTOList(logs);
+        return ResponseEntity.ok(new ApiResponse(true, "Active visits retrieved successfully", body));
+    }
+
+    @GetMapping("/host/{hostId}")
+    @Operation(summary = "Get visit logs by host ID")
+    public ResponseEntity<ApiResponse> getVisitLogsByHostId(@PathVariable Long hostId) {
+        List<VisitLog> logs = visitLogService.getVisitLogsByHostId(hostId);
+        List<VisitLogDTO> body = DTOConverter.toVisitLogDTOList(logs);
+        return ResponseEntity.ok(new ApiResponse(true, "Host visit logs retrieved successfully", body));
+    }
+
+    @GetMapping("/visitor/{visitorId}")
+    @Operation(summary = "Get visit logs by visitor ID")
+    public ResponseEntity<ApiResponse> getVisitLogsByVisitorId(@PathVariable Long visitorId) {
+        List<VisitLog> logs = visitLogService.getVisitLogsByVisitorId(visitorId);
+        List<VisitLogDTO> body = DTOConverter.toVisitLogDTOList(logs);
+        return ResponseEntity.ok(new ApiResponse(true, "Visitor visit logs retrieved successfully", body));
+    }
+}
