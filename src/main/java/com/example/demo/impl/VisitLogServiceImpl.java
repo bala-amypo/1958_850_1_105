@@ -1,5 +1,6 @@
 package com.example.demo.impl;
 
+import com.example.demo.dto.VisitLogDTO;
 import com.example.demo.entity.VisitLog;
 import com.example.demo.entity.Visitor;
 import com.example.demo.entity.Host;
@@ -23,7 +24,7 @@ public class VisitLogServiceImpl implements VisitLogService {
     }
 
     @Override
-    public VisitLog checkInVisitor(Long visitorId, Long hostId, String purpose) {
+    public VisitLogDTO checkInVisitor(Long visitorId, Long hostId, String purpose) {
         Visitor visitor = visitorRepository.findById(visitorId)
                 .orElseThrow(() -> new RuntimeException("Visitor not found"));
         Host host = hostRepository.findById(hostId)
@@ -35,17 +36,51 @@ public class VisitLogServiceImpl implements VisitLogService {
         visitLog.setPurpose(purpose);
         visitLog.setAccessGranted(true);
         visitLog.setAlertSent(false);
-        return visitLogRepository.save(visitLog);
+        VisitLog saved = visitLogRepository.save(visitLog);
+        return new VisitLogDTO(saved.getId(), visitorId, hostId, saved.getCheckInTime(), null, purpose, true, false);
     }
 
     @Override
-    public VisitLog checkOutVisitor(Long visitLogId) {
+    public VisitLogDTO checkOutVisitor(Long visitLogId) {
         VisitLog visitLog = visitLogRepository.findById(visitLogId)
                 .orElseThrow(() -> new RuntimeException("VisitLog not found"));
         if (visitLog.getCheckOutTime() != null) {
             throw new RuntimeException("Visitor not checked in");
         }
         visitLog.setCheckOutTime(java.time.LocalDateTime.now());
-        return visitLogRepository.save(visitLog);
+        VisitLog saved = visitLogRepository.save(visitLog);
+        return new VisitLogDTO(saved.getId(), saved.getVisitor().getId(), saved.getHost().getId(), 
+                              saved.getCheckInTime(), saved.getCheckOutTime(), saved.getPurpose(), 
+                              saved.getAccessGranted(), saved.isAlertSent());
+    }
+
+    @Override
+    public java.util.List<VisitLogDTO> getActiveVisits() {
+        return visitLogRepository.findByCheckOutTimeIsNull()
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    @Override
+    public VisitLogDTO getVisitLog(Long id) {
+        VisitLog visitLog = visitLogRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("VisitLog not found"));
+        return toDTO(visitLog);
+    }
+
+    @Override
+    public java.util.List<VisitLogDTO> getVisitLogsByVisitorId(Long visitorId) {
+        return visitLogRepository.findByVisitorId(visitorId)
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    private VisitLogDTO toDTO(VisitLog visitLog) {
+        return new VisitLogDTO(visitLog.getId(), visitLog.getVisitor().getId(), 
+                              visitLog.getHost().getId(), visitLog.getCheckInTime(), 
+                              visitLog.getCheckOutTime(), visitLog.getPurpose(), 
+                              visitLog.getAccessGranted(), visitLog.isAlertSent());
     }
 }
