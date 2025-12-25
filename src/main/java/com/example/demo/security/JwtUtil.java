@@ -16,10 +16,10 @@ import java.util.Map;
 public class JwtUtil {
     
     @Value("${app.jwtSecret:0123456789ABCDEF0123456789ABCDEF}")
-    private String secret;
+    private String secret = "0123456789ABCDEF0123456789ABCDEF";
     
     @Value("${app.jwtExpirationMs:3600000}")
-    private long jwtExpirationMs;
+    private long jwtExpirationMs = 3600000L;
     
     // For tests - ReflectionTestUtils
     public void setSecret(String secret) {
@@ -49,6 +49,7 @@ public class JwtUtil {
                 .compact();
     }
     
+    // Test-compatible method - returns Claims directly (matches test expectations)
     public Claims validateAndGetClaims(String token) {
         try {
             return Jwts.parser()
