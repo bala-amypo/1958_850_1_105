@@ -38,8 +38,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthResponse login(AuthRequest request) {
-        // FINAL FIX: Your AuthRequest has getEmail(), not email()
-        User user = userRepository.findByEmail(request.getEmail())
+        // FIXED: AuthRequest has username, not email
+        User user = userRepository.findByEmail(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
