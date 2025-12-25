@@ -9,12 +9,27 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 
+// Wrapper class to mimic getBody() for tests
+class ClaimsWrapper {
+    private final Claims claims;
+
+    public ClaimsWrapper(Claims claims) {
+        this.claims = claims;
+    }
+
+    public Claims getBody() {
+        return claims;
+    }
+}
+
 @Component
 public class JwtUtil {
 
-    private final Key key = Keys.hmacShaKeyFor("ThisIsAVeryStrongJwtSecretKeyWithMoreThan32Chars!".getBytes());
+    private final Key key = Keys.hmacShaKeyFor(
+            "ThisIsAVeryStrongJwtSecretKeyWithMoreThan32Chars!".getBytes()
+    );
 
-    // single-arg token generation
+    // generate token (single arg)
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
@@ -22,7 +37,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    // overloaded token generation for test cases
+    // generate token (4 args) for AuthTests
     public String generateToken(String username, String role, Long id, String email) {
         return Jwts.builder()
                 .setSubject(username)
@@ -33,12 +48,13 @@ public class JwtUtil {
                 .compact();
     }
 
-    // validate token and get Claims
-    public Claims validateAndGetClaims(String token) {
+    // validate token and return ClaimsWrapper with getBody()
+    public ClaimsWrapper validateAndGetClaims(String token) {
         Jws<Claims> jws = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token);
-        return jws.getBody();
+
+        return new ClaimsWrapper(jws.getBody());
     }
 }
