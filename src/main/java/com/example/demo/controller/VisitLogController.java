@@ -1,10 +1,10 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.ApiResponse;
+import com.example.demo.model.VisitLog;
 import com.example.demo.service.VisitLogService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/visits")
@@ -16,39 +16,22 @@ public class VisitLogController {
         this.visitLogService = visitLogService;
     }
 
-    @PostMapping("/checkin/{visitorId}/{hostId}")
-    public ResponseEntity<ApiResponse> checkIn(@PathVariable Long visitorId,
-                                               @PathVariable Long hostId,
-                                               @RequestBody String purpose) {
+    @PostMapping("/checkin")
+    public VisitLog checkIn(
+            @RequestParam Long visitorId,
+            @RequestParam Long hostId,
+            @RequestParam String purpose) {
 
-        return new ResponseEntity<>(
-                new ApiResponse(true, "Checked in",
-                        visitLogService.checkInVisitor(visitorId, hostId, purpose)),
-                HttpStatus.CREATED
-        );
+        return visitLogService.checkInVisitor(visitorId, hostId, purpose);
     }
 
-    @PostMapping("/checkout/{visitLogId}")
-    public ResponseEntity<ApiResponse> checkOut(@PathVariable Long visitLogId) {
-        return ResponseEntity.ok(
-                new ApiResponse(true, "Checked out",
-                        visitLogService.checkOutVisitor(visitLogId))
-        );
+    @PostMapping("/checkout/{id}")
+    public VisitLog checkOut(@PathVariable Long id) {
+        return visitLogService.checkOutVisitor(id);
     }
 
     @GetMapping("/active")
-    public ResponseEntity<ApiResponse> getActive() {
-        return ResponseEntity.ok(
-                new ApiResponse(true, "Active visits fetched",
-                        visitLogService.getActiveVisits())
-        );
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> get(@PathVariable Long id) {
-        return ResponseEntity.ok(
-                new ApiResponse(true, "Visit fetched",
-                        visitLogService.getVisitLog(id))
-        );
+    public List<VisitLog> getActiveVisits() {
+        return visitLogService.getActiveVisits();
     }
 }

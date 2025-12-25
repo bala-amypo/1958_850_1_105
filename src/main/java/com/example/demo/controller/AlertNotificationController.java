@@ -1,9 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.ApiResponse;
+import com.example.demo.model.AlertNotification;
 import com.example.demo.service.AlertNotificationService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,28 +14,11 @@ public class AlertNotificationController {
         this.alertService = alertService;
     }
 
-    @PostMapping("/send/{visitLogId}")
-    public ResponseEntity<ApiResponse> send(@PathVariable Long visitLogId) {
-        return new ResponseEntity<>(
-                new ApiResponse(true, "Alert sent",
-                        alertService.sendAlert(visitLogId)),
-                HttpStatus.CREATED
-        );
-    }
+    @PostMapping("/send")
+    public AlertNotification sendAlert(
+            @RequestParam Long visitLogId,
+            @RequestParam String message) {
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> get(@PathVariable Long id) {
-        return ResponseEntity.ok(
-                new ApiResponse(true, "Alert fetched",
-                        alertService.getAlert(id))
-        );
-    }
-
-    @GetMapping
-    public ResponseEntity<ApiResponse> getAll() {
-        return ResponseEntity.ok(
-                new ApiResponse(true, "Alerts fetched",
-                        alertService.getAllAlerts())
-        );
+        return alertService.sendAlert(visitLogId, message);
     }
 }
