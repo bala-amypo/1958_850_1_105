@@ -33,20 +33,13 @@ public class AppointmentController {
             @Valid @RequestBody AppointmentDTO appointmentDTO) {
 
         Appointment appointment = new Appointment();
-
-        // ✅ FIX: LocalDateTime → LocalDate
-        appointment.setAppointmentDate(
-                appointmentDTO.getAppointmentDate() != null
-                        ? appointmentDTO.getAppointmentDate().toLocalDate()
-                        : null
-        );
-
+        // DTO and entity both use LocalDateTime now
+        appointment.setAppointmentDate(appointmentDTO.getAppointmentDate());
         appointment.setPurpose(appointmentDTO.getPurpose());
         appointment.setStatus("SCHEDULED");
 
         Appointment saved = appointmentService.createAppointment(visitorId, hostId, appointment);
         AppointmentDTO result = DTOConverter.toAppointmentDTO(saved);
-
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse(true, "Appointment created successfully", result));
     }
@@ -56,42 +49,29 @@ public class AppointmentController {
     public ResponseEntity<ApiResponse> getAllAppointments() {
         List<AppointmentDTO> appointments =
                 DTOConverter.toAppointmentDTOList(appointmentService.getAllAppointments());
-        return ResponseEntity.ok(
-                new ApiResponse(true, "Appointments retrieved successfully", appointments)
-        );
+        return ResponseEntity.ok(new ApiResponse(true, "Appointments retrieved successfully", appointments));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get appointment by ID")
     public ResponseEntity<ApiResponse> getAppointmentById(@PathVariable Long id) {
-        AppointmentDTO result =
-                DTOConverter.toAppointmentDTO(appointmentService.getAppointmentById(id));
-        return ResponseEntity.ok(
-                new ApiResponse(true, "Appointment retrieved successfully", result)
-        );
+        AppointmentDTO result = DTOConverter.toAppointmentDTO(appointmentService.getAppointmentById(id));
+        return ResponseEntity.ok(new ApiResponse(true, "Appointment retrieved successfully", result));
     }
 
     @GetMapping("/host/{hostId}")
     @Operation(summary = "Get appointments by host ID")
     public ResponseEntity<ApiResponse> getAppointmentsByHostId(@PathVariable Long hostId) {
         List<AppointmentDTO> appointments =
-                DTOConverter.toAppointmentDTOList(
-                        appointmentService.getAppointmentsByHostId(hostId)
-                );
-        return ResponseEntity.ok(
-                new ApiResponse(true, "Host appointments retrieved successfully", appointments)
-        );
+                DTOConverter.toAppointmentDTOList(appointmentService.getAppointmentsByHostId(hostId));
+        return ResponseEntity.ok(new ApiResponse(true, "Host appointments retrieved successfully", appointments));
     }
 
     @GetMapping("/visitor/{visitorId}")
     @Operation(summary = "Get appointments by visitor ID")
     public ResponseEntity<ApiResponse> getAppointmentsByVisitorId(@PathVariable Long visitorId) {
         List<AppointmentDTO> appointments =
-                DTOConverter.toAppointmentDTOList(
-                        appointmentService.getAppointmentsByVisitorId(visitorId)
-                );
-        return ResponseEntity.ok(
-                new ApiResponse(true, "Visitor appointments retrieved successfully", appointments)
-        );
+                DTOConverter.toAppointmentDTOList(appointmentService.getAppointmentsByVisitorId(visitorId));
+        return ResponseEntity.ok(new ApiResponse(true, "Visitor appointments retrieved successfully", appointments));
     }
 }

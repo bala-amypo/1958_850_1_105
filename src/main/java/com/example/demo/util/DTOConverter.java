@@ -38,14 +38,7 @@ public class DTOConverter {
             dto.setVisitorId(appointment.getVisitor().getId());
         if (appointment.getHost() != null && appointment.getHost().getId() != null)
             dto.setHostId(appointment.getHost().getId());
-
-        // ✅ FIX: LocalDate → LocalDateTime
-        dto.setAppointmentDate(
-                appointment.getAppointmentDate() != null
-                        ? appointment.getAppointmentDate().atStartOfDay()
-                        : null
-        );
-
+        dto.setAppointmentDate(appointment.getAppointmentDate());  // LocalDateTime
         dto.setPurpose(appointment.getPurpose());
         dto.setStatus(appointment.getStatus());
         return dto;
