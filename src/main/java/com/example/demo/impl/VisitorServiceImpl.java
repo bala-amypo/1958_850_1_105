@@ -16,6 +16,14 @@ public class VisitorServiceImpl implements VisitorService {
     @Autowired
     private VisitorRepository visitorRepository;
 
+    // Added so tests can new VisitorServiceImpl(visitorRepository)
+    public VisitorServiceImpl() {
+    }
+
+    public VisitorServiceImpl(VisitorRepository visitorRepository) {
+        this.visitorRepository = visitorRepository;
+    }
+
     @Override
     public VisitorDTO createVisitor(VisitorDTO visitorDTO) {
         Visitor visitor = new Visitor();
@@ -75,9 +83,14 @@ public class VisitorServiceImpl implements VisitorService {
         visitorRepository.deleteById(id);
     }
 
-    // Helper used by tests to get entity directly
-    public Visitor getVisitorEntity(Long id) {
+    // Helper used by tests to get entity directly: visitorService.getVisitor(long)
+    public Visitor getVisitor(long id) {
         return visitorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Visitor not found"));
+    }
+
+    // Existing helper (optional, can stay)
+    public Visitor getVisitorEntity(Long id) {
+        return getVisitor(id);
     }
 }
