@@ -24,27 +24,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User register(RegisterRequest request) {
-        if (userRepository.findByEmail(request.email()).isPresent()) {
+    public AuthResponse register(RegisterRequest request) {
+        // FIXED: Use getEmail() and getPassword()
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
         User user = new User();
-        user.setEmail(request.email());
-        user.setPassword(passwordEncoder.encode(request.password()));
-        return userRepository.save(user);
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        User savedUser = userRepository.save(user);
+        String token = jwtUtil.generateToken(savedUser.getEmail(), "USER");
+        return new AuthResponse(token, savedUser.getEmail(), "USER", "Registration successful");
     }
 
     @Override
     public AuthResponse login(AuthRequest request) {
-        User user = userRepository.findByEmail(request.email())
+        // FIXED: Use getEmail() and getPassword()
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
         
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
         
         String token = jwtUtil.generateToken(user.getEmail(), "USER");
-        return new AuthResponse(token);
+        return new AuthResponse(token, user.getEmail(), "USER", "Login successful");
     }
 
     @Override

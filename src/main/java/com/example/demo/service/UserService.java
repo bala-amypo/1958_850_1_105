@@ -6,7 +6,7 @@ import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.User;
 
 public interface UserService {
-    User register(RegisterRequest request);
+    AuthResponse register(RegisterRequest request);  // CHANGED: returns AuthResponse
     AuthResponse login(AuthRequest request);
     User findByEmail(String email);
     User updateUser(User user);
