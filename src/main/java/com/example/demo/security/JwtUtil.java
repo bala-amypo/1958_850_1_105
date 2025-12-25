@@ -10,44 +10,51 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
+
     public String secret;
     public Long jwtExpirationMs;
 
-    public JwtUtil() {}
+    public JwtUtil() {
+    }
 
     public String generateToken(String username, String role, Long userId, String email) {
         return Jwts.builder()
-            .setSubject(username)
-            .claim("role", role)
-            .claim("userId", userId)
-            .claim("email", email)
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-            .compact();
+                .setSubject(username)
+                .claim("role", role)
+                .claim("userId", userId)
+                .claim("email", email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
     // FOR TESTS - 2 params
     public String generateToken(String username, String role) {
         return Jwts.builder()
-            .setSubject(username)
-            .claim("role", role)
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-            .compact();
+                .setSubject(username)
+                .claim("role", role)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
     public Claims validateAndGetClaims(String token) {
         try {
             return Jwts.parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+                    .setSigningKey(getSignInKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
         } catch (Exception e) {
             throw new JwtException("Invalid JWT token");
         }
+    }
+
+    // Helper so tests can effectively do "claims.getBody()" via JwtUtil
+    public Claims getBody(Claims claims) {
+        return claims;
     }
 
     // JWTAuthenticationFilter expects these EXACT methods
