@@ -5,11 +5,10 @@ public class RegisterRequest {
     private String username;
     private String email;
     private String password;
-    private String role;   // "ADMIN" or "USER"
+    private String role; // "ADMIN" or "USER"
 
     public RegisterRequest() {}
 
-    // getters/setters
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
