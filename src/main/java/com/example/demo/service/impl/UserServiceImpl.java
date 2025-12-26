@@ -24,6 +24,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void register(RegisterRequest request) {
+        if (request.getUsername() == null || request.getPassword() == null || request.getEmail() == null) {
+            throw new IllegalArgumentException("username, email, password are required");
+        }
+
         userRepository.findByUsername(request.getUsername())
                 .ifPresent(u -> { throw new IllegalArgumentException("Username already exists"); });
 

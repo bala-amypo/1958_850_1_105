@@ -21,13 +21,29 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody RegisterRequest request) {
-        userService.register(request);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        try {
+            userService.register(request);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (IllegalArgumentException ex) {
+            // return 400 instead of 500
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Registration failed");
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-        return ResponseEntity.ok(userService.login(request));
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+        try {
+            AuthResponse response = userService.login(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Login failed");
+        }
     }
 }
