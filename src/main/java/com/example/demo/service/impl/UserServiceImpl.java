@@ -24,7 +24,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void register(RegisterRequest request) {
-        // very basic uniqueness checks
         userRepository.findByUsername(request.getUsername())
                 .ifPresent(u -> { throw new IllegalArgumentException("Username already exists"); });
 
