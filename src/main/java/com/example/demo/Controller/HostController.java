@@ -21,14 +21,9 @@ public class HostController {
     }
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody Host host) {
-        try {
-            Host saved = hostService.createHost(host);
-            return new ResponseEntity<>(saved, HttpStatus.CREATED);
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Could not create host");
-        }
+    public ResponseEntity<Host> create(@RequestBody Host host) {
+        Host saved = hostService.createHost(host);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
