@@ -2,9 +2,12 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 @Entity
 @Table(name = "visit_logs")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class VisitLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

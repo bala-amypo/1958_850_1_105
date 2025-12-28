@@ -2,9 +2,12 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 @Entity
 @Table(name = "alert_notifications")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class AlertNotification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
