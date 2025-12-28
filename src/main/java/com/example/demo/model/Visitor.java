@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "visitors")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Visitor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
