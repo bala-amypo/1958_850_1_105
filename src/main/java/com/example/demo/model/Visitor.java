@@ -25,7 +25,7 @@ public class Visitor {
     
     private String email;
     
-    // constructors
+    
     public Visitor() {}
     
     // getters and setters

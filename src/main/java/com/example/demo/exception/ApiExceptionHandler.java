@@ -30,7 +30,7 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(body, status);
     }
 
-    // 404 – resource not found (you can start using this later if you want)
+   
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Object> handleResourceNotFound(
             ResourceNotFoundException ex,
